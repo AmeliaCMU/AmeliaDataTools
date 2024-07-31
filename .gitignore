@@ -9,7 +9,7 @@ __pycache__/
 **out**
 .vscode/
 datasets
-! datasets/.gitkeep
+!datasets/.gitkeep
 
 # Distribution / packaging
 .Python
