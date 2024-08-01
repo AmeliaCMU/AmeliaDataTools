@@ -1,20 +1,12 @@
-from turtle import color
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
-import pickle
 import sys
-
 from tqdm import tqdm
 
-sys.path.insert(1, '../utils/')
-from common import *
-
-plt.rcParams['font.size'] = 6
-OUT_DIR = os.path.join(VIS_DIR, __file__.split('/')[-1].split(".")[0])
-os.makedirs(OUT_DIR, exist_ok=True)
-print(f"Created output directory in: {OUT_DIR}")
+from amelia_datatools.utils.common import AIRPORT_COLORMAP, VIS_DIR, DATA_DIR, VERSION, DPI
+from amelia_datatools.utils import utils
 
 
 def get_agent_type(agent_type_vals):
@@ -24,32 +16,40 @@ def get_agent_type(agent_type_vals):
         return 'Vehicle'
     return 'Unknown'
 
-def plot(ipath: str, dpi: int, num_files: int):
+
+def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
+    input_dir = os.path.join(base_dir, f"traj_data_{traj_version}", 'raw_trajectories')
+    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+    os.makedirs(out_dir, exist_ok=True)
+    print(f"Created output directory in: {out_dir}")
+
+    plt.rcParams['font.size'] = 6
+
     airports = AIRPORT_COLORMAP.keys()
     num_airports = len(airports)
-    
+
     moving_agents = {
         'All': {
             'Moving': [0 for _ in range(num_airports)],
-            'Stationary' : [0 for _ in range(num_airports)],
-        }, 
+            'Stationary': [0 for _ in range(num_airports)],
+        },
         'Aircraft': {
             'Moving': [0 for _ in range(num_airports)],
-            'Stationary' : [0 for _ in range(num_airports)],
-        }, 
+            'Stationary': [0 for _ in range(num_airports)],
+        },
         'Vehicle': {
             'Moving': [0 for _ in range(num_airports)],
-            'Stationary' : [0 for _ in range(num_airports)],
+            'Stationary': [0 for _ in range(num_airports)],
         },
         'Unknown': {
             'Moving': [0 for _ in range(num_airports)],
-            'Stationary' : [0 for _ in range(num_airports)],
+            'Stationary': [0 for _ in range(num_airports)],
         }
     }
     for i, airport in enumerate(airports):
         airport_up = airport.upper()
         print(f"Running airport: {airport_up}")
-        airport_dir = os.path.join(ipath, airport)
+        airport_dir = os.path.join(input_dir, airport)
         traj_files = [os.path.join(airport_dir, f) for f in os.listdir(airport_dir)]
 
         N = num_files
@@ -86,21 +86,24 @@ def plot(ipath: str, dpi: int, num_files: int):
             p = ax.bar(
                 airports, data_counts, width, label=data_type, bottom=bottom, color=colors, alpha=alpha)
             bottom += data_counts
-        
+
         for spine in ax.spines.values():
             spine.set_edgecolor(fontcolor)
 
         ax.set_title('Moving vs. Stationary Agents', color=fontcolor, fontsize=15)
         ax.tick_params(color=fontcolor, labelcolor=fontcolor)
         ax.legend()
-        plt.savefig(f"{OUT_DIR}/moving_stationary_{agent_type.lower()}.png", dpi=dpi, bbox_inches='tight')
+        plt.savefig(f"{out_dir}/moving_stationary_{agent_type.lower()}.png",
+                    dpi=dpi, bbox_inches='tight')
 
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('--ipath', default='../datasets/amelia/traj_data_a10v7/raw_trajectories', type=str, help='Input path.')
-    parser.add_argument('--dpi', type=int, default=600)
+    parser.add_argument(
+        '--base_dir', default=DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', default=VERSION, type=str)
+    parser.add_argument('--dpi', type=int, default=DPI)
     parser.add_argument('--num_files', type=int, default=-1)
     args = parser.parse_args()
 
