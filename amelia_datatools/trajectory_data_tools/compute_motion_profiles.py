@@ -1,61 +1,57 @@
+from tqdm import tqdm
 import pickle
-import cv2
-import json
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
 import random
-import sys
 
-sys.path.insert(1, '../utils/')
-from tqdm import tqdm
+from amelia_datatools.utils.common import DPI, VERSION, CACHE_DIR, KNOTS_2_MS, AIRPORT_COLORMAP, DATA_DIR
 
-from common import *
 
 class TrajectoryProcessor():
     def __init__(
-        self, airport: str, ipath: str, version: str, to_process: float, drop_interp: bool,
-        agent_types: str, dpi: int
+        self, airport: str, base_path: str, traj_version: str, to_process: float, drop_interp: bool,
+        agent_type: str, dpi: int
     ):
-        self.base_dir = ipath
+        self.base_dir = base_path
 
         self.airport = airport
-        self.dpi = dpi 
+        self.dpi = dpi
         self.drop_interp = drop_interp
-        self.agent_types = agent_types
+        self.agent_type = agent_type
 
         trajectories_dir = os.path.join(
-            self.base_dir, f'traj_data_{version}', 'raw_trajectories', self.airport)
+            self.base_dir, f'traj_data_{traj_version}', 'raw_trajectories', self.airport)
         print(f"Analyzing data in: {trajectories_dir}")
-        self.trajectory_files = [os.path.join(trajectories_dir, f) for f in os.listdir(trajectories_dir)]
+        self.trajectory_files = [os.path.join(trajectories_dir, f)
+                                 for f in os.listdir(trajectories_dir)]
         random.shuffle(self.trajectory_files)
         self.trajectory_files = self.trajectory_files[:int(len(self.trajectory_files) * to_process)]
-    
+
     def process_file(self, data):
         # data = data[:][data['Type'] == 0]
         agents_ids = data.ID.unique().tolist()
-        
+
         delta_heading_mean, delta_heading_max = [], []
-        delta_acceleration_mean, delta_acceleration_max  = [], []
+        delta_acceleration_mean, delta_acceleration_max = [], []
         speed_mean, speed_max = [], []
 
         for agent_id in agents_ids:
             agent_data = data[:][data.ID == agent_id]
             agent_type = agent_data.Type.values
-            if self.agent_types == 'aircraft':
+            if self.agent_type == 'aircraft':
                 if (agent_type == 0.0).sum() < (agent_data.shape[0] // 2):
                     continue
-            elif self.agent_types == 'vehicle':
+            elif self.agent_type == 'vehicle':
                 if (agent_type == 1.0).sum() < (agent_data.shape[0] // 2):
                     continue
 
             time_range = agent_data.Frame.values
             if len(time_range) < 2:
-                continue # Skip sequences shorter than 2 steps
-        
+                continue  # Skip sequences shorter than 2 steps
+
             # Get all data corresponding to the agent in question
-            movement = agent_data[agent_data.Frame.isin(time_range)] # wth is this?
+            movement = agent_data[agent_data.Frame.isin(time_range)]  # wth is this?
             if self.drop_interp:
                 movement = movement[:][movement.Interp == '[ORG]']
                 if movement.shape[0] < 2:
@@ -63,12 +59,12 @@ class TrajectoryProcessor():
 
             # Read speed and heading and get time step wise difference
             agent_heading = movement.Heading.values
-            agent_speed = movement.Speed.values * KNOTS_2_MS #m/s
+            agent_speed = movement.Speed.values * KNOTS_2_MS  # m/s
 
-            heading_diff = 180 - abs(abs(agent_heading[1:] - agent_heading[:-1]) - 180) # Degrees
-            speed_diff =  agent_speed[1:] - agent_speed[:-1]
+            heading_diff = 180 - abs(abs(agent_heading[1:] - agent_heading[:-1]) - 180)  # Degrees
+            speed_diff = agent_speed[1:] - agent_speed[:-1]
 
-            mean_acceleration = speed_diff.mean() #m/s2
+            mean_acceleration = speed_diff.mean()  # m/s2
             max_acceleration = max(abs(speed_diff))
 
             mean_heading = heading_diff.mean()
@@ -77,7 +73,7 @@ class TrajectoryProcessor():
             # Append to information vectors
             delta_heading_mean.append(mean_heading)
             delta_heading_max.append(max_heading)
-            
+
             speed_mean.append(agent_speed.mean())
             speed_max.append(agent_speed.max())
 
@@ -87,7 +83,7 @@ class TrajectoryProcessor():
         acc = {'mean': delta_acceleration_mean, 'max': delta_acceleration_max}
         speed = {'mean': speed_mean, 'max': speed_max}
         heading = {'mean': delta_heading_mean, 'max': delta_heading_max}
-        
+
         return acc, speed, heading
 
     def compute_motion_profiles(self):
@@ -99,12 +95,12 @@ class TrajectoryProcessor():
         }
         heading_profile = {
             "mean": [],
-            "max": [], 
+            "max": [],
             # "all": []
         }
         speed_profile = {
             "mean": [],
-            "max": [], 
+            "max": [],
             # "all": []
         }
         for trajectory_file in tqdm(self.trajectory_files):
@@ -134,40 +130,44 @@ class TrajectoryProcessor():
         return acc_profile, speed_profile, heading_profile
 
 
-if __name__ == '__main__':
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    parser.add_argument('--ipath', default='../datasets/amelia', type=str, help='Input path.')
-    parser.add_argument('--version', type=str, default='a10v08')
-    parser.add_argument('--to_process', default=1.0,type=float)
-    parser.add_argument('--drop_interp', action='store_true')
-    parser.add_argument('--agent_types', default='aircraft', choices=['aircraft', 'vehicle', 'unknown', 'all'])
-    parser.add_argument('--dpi', type=int, default=800)
-    args = parser.parse_args()
-
+def run_processor(base_path, traj_version, to_process, drop_interp, agent_type, dpi):
     out_dir = os.path.join(CACHE_DIR, __file__.split('/')[-1].split(".")[0])
     os.makedirs(out_dir, exist_ok=True)
-
     acc_profile, speed_profile, heading_profile = {}, {}, {}
     for airport in AIRPORT_COLORMAP.keys():
-        args.airport = airport
-        processor = TrajectoryProcessor(**vars(args))
+        processor = TrajectoryProcessor(airport, base_path, traj_version,
+                                        to_process, drop_interp, agent_type, dpi)
         acc, speed, heading = processor.compute_motion_profiles()
         acc_profile[airport] = acc
         speed_profile[airport] = speed
         heading_profile[airport] = heading
-    
-    suffix = '_dropped_int' if args.drop_interp else ''
-    suffix += f'_{args.agent_types}'
-    out_file = os.path.join(out_dir, f'acceleration_profiles{suffix}.pkl')
+
+    suffix = '_dropped_int' if drop_interp else ''
+    suffix += f'_{agent_type}'
+    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles',
+                            f'acceleration_profiles{suffix}.pkl')
     with open(out_file, 'wb') as f:
         pickle.dump(acc_profile, f)
-    
-    out_file = os.path.join(out_dir, f'speed_profiles{suffix}.pkl')
+
+    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'speed_profiles{suffix}.pkl')
     with open(out_file, 'wb') as f:
         pickle.dump(speed_profile, f)
 
-    out_file = os.path.join(out_dir, f'heading_profiles{suffix}.pkl')
+    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'heading_profiles{suffix}.pkl')
     with open(out_file, 'wb') as f:
         pickle.dump(heading_profile, f)
-    
+
+
+if __name__ == '__main__':
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('--base_path', default=DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', type=str, default=VERSION)
+    parser.add_argument('--to_process', default=1.0, type=float)
+    parser.add_argument('--drop_interp', action='store_true')
+    parser.add_argument('--agent_type', default='aircraft',
+                        choices=['aircraft', 'vehicle', 'unknown', 'all'])
+    parser.add_argument('--dpi', type=int, default=DPI)
+    args = parser.parse_args()
+
+    run_processor(**vars(args))

@@ -8,17 +8,18 @@ ROOT_DIR = os.path.join(ROOT_DIR, "../..")
 ROOT_DIR = os.path.normpath(ROOT_DIR)
 OUT_DIR = os.path.join(ROOT_DIR, "output")
 
-VIS_DIR = f"{OUT_DIR}/vis"
-STATS_DIR = f"{OUT_DIR}/stats"
-CACHE_DIR = f"{OUT_DIR}/cache"
+VIS_DIR = os.path.join(f"{OUT_DIR}", "visualization")
+STATS_DIR = os.path.join(f"{OUT_DIR}", "stats")
+CACHE_DIR = os.path.join(f"{OUT_DIR}", "cache")
 
 DATA_DIR = os.path.join(ROOT_DIR, "datasets/amelia")
 VERSION = "a10v08"
-TRAJ_DATA_DIR = f"{DATA_DIR}/traj_data_{VERSION}"
-ASSET_DATA_DIR = f"{DATA_DIR}/assets"
-GRAPH_DATA_DIR = f"{DATA_DIR}/graph_data"
+TRAJ_DATA_DIR = os.path.join(f"{DATA_DIR}", f"traj_data_{VERSION}")
+ASSET_DATA_DIR = os.path.join(f"{DATA_DIR}", "assets")
+GRAPH_DATA_DIR = os.path.join(f"{DATA_DIR}", "graph_data")
 
 # Global variables
+DPI = 600
 
 
 class AgentType(Enum):
