@@ -1,4 +1,3 @@
-from gettext import install
 from setuptools import setup, find_packages
 
 setup(
@@ -15,5 +14,6 @@ setup(
         "pyproj==3.6.1",
         'scipy==1.9.1',
         "seaborn",
+        "PyYAML",
     ]
 )

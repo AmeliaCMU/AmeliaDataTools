@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
-import sys
 from tqdm import tqdm
 
 from amelia_datatools.utils.common import DPI, VERSION, VIS_DIR, AIRPORT_COLORMAP, DATA_DIR

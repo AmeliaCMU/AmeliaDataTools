@@ -10,10 +10,10 @@ from amelia_datatools.utils.common import DPI, VERSION, CACHE_DIR, KNOTS_2_MS, A
 
 class TrajectoryProcessor():
     def __init__(
-        self, airport: str, base_path: str, traj_version: str, to_process: float, drop_interp: bool,
+        self, airport: str, base_dir: str, traj_version: str, to_process: float, drop_interp: bool,
         agent_type: str, dpi: int
     ):
-        self.base_dir = base_path
+        self.base_dir = base_dir
 
         self.airport = airport
         self.dpi = dpi
@@ -161,7 +161,7 @@ def run_processor(base_path, traj_version, to_process, drop_interp, agent_type, 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('--base_path', default=DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
     parser.add_argument('--traj_version', type=str, default=VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')

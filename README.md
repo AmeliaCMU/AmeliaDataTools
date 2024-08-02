@@ -91,6 +91,53 @@
 
 ## How to use
 
+### Trajectory Tools
+
+#### Compute Agent Counts
+
+`compute_agent_counts.py` computes the number of agents per timestep. Run the following command:
+
+```bash
+python amelia_data_tools/trajectory_tools/compute_agent_counts.py
+```
+
+The output will be saved in the `./output/stats/compute_agent_counts` directory.
+
+#### Compute Limits
+
+`compute_limits.py` computes the limits of the airports anad updates them. Run the following command:
+
+```bash
+python amelia_data_tools/trajectory_tools/compute_limits.py
+```
+
+The output will be saved in the `./output/cache/compute_limits` directory.
+
+#### Compute Motion Profiles
+
+`compute_motion_profiles.py` computes the motion profiles of the agents. Run the following command:
+
+```bash
+python amelia_data_tools/trajectory_tools/compute_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --agent_type [agent_type]
+```
+
+Where:
+
+- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
+- `[to_process]` is the percentage of files to process. By default it is set to `1.0`.
+- `--drop_interp` is a flag to drop the interpolated points. By default it is set to `False`.
+
+#### Compute Sequence Lengths
+
+`compute_sequence_lengths.py` computes the sequence lengths of the agents by aerport. Run the following command:
+
+```bash
+python amelia_data_tools/trajectory_tools/compute_sequence_lengths.py
+```
+
+The output will be saved in the `./output/stats/compute_sequence_lengths` directory.
+
 ### Visualization Tools
 
 #### Plot Agent Statistics
