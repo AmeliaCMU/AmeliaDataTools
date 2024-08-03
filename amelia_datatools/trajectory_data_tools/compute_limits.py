@@ -1,17 +1,17 @@
 import json
-import math 
-import os 
+import math
+import os
 import pandas as pd
-import sys
 import yaml
 
 from easydict import EasyDict
 from tqdm import tqdm
 
-sys.path.insert(1, '../utils/')
-from common import *
 
-class RunningStats:    
+from amelia_datatools.utils.common import AIRPORT_COLORMAP, ASSET_DATA_DIR, TRAJ_DATA_DIR
+
+
+class RunningStats:
     def __init__(self):
         self.n = 0
         self.old_m = 0
@@ -44,7 +44,8 @@ class RunningStats:
     def std(self):
         return math.sqrt(self.variance())
 
-if __name__ == "__main__":
+
+def run_limits():
     black_list = ['Frame', 'ID', 'Type', 'Interp']
     for airport in AIRPORT_COLORMAP.keys():
         print(f"Running: {airport.upper()}")
@@ -66,13 +67,13 @@ if __name__ == "__main__":
         limits = {}
         incstats = {}
         for k, v in data.items():
-            if k in black_list: 
+            if k in black_list:
                 continue
             limits[k] = {
                 "min": float('inf'), "max": -float('inf'), "mean": 0.0, "std": 0.0
             }
             incstats[k] = RunningStats()
-        
+
         for f in tqdm(traj_files):
             data = pd.read_csv(traj_files[0])
             for k in limits.keys():
@@ -80,15 +81,19 @@ if __name__ == "__main__":
                 limits[k]["min"] = min(limits[k]["min"], arr.min())
                 limits[k]["max"] = max(limits[k]["max"], arr.max())
 
-                for a in arr: 
+                for a in arr:
                     incstats[k].push(a)
 
             for k in limits.keys():
                 limits[k]["mean"] = incstats[k].mean()
                 limits[k]["std"] = incstats[k].std()
 
-        ref_data['limits'] = limits 
-        limits_file = limits_file.split('.')[0] + '.yaml'
+        ref_data['limits'] = limits
+        limits_file = os.path.splitext(limits_file)[0] + '.yaml'
         with open(limits_file, 'w') as f:
             yaml.dump(ref_data, f)
         print(f"\tAdding limits to reference file in: {limits_file}")
+
+
+if __name__ == "__main__":
+    run_limits()
