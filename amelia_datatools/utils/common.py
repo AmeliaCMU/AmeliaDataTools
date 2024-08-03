@@ -9,7 +9,7 @@ ROOT_DIR = os.path.normpath(ROOT_DIR)
 OUT_DIR = os.path.join(ROOT_DIR, "output")
 
 VIS_DIR = os.path.join(f"{OUT_DIR}", "visualization")
-STATS_DIR = os.path.join(f"{OUT_DIR}", "stats")
+STATS_DIR = os.path.join(f"{OUT_DIR}", "statistics")
 CACHE_DIR = os.path.join(f"{OUT_DIR}", "cache")
 
 DATA_DIR = os.path.join(ROOT_DIR, "datasets/amelia")
