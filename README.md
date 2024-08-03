@@ -92,9 +92,12 @@
 ## How to use
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 8a0c86b (Refactored tarajectory tools (#3))
+=======
+>>>>>>> 866d1a1 (Refac debug tools (#5))
 ### Trajectory Tools
 
 #### Compute Agent Counts
@@ -143,10 +146,13 @@ python amelia_data_tools/trajectory_tools/compute_sequence_lengths.py
 The output will be saved in the `./output/stats/compute_sequence_lengths` directory.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> refac_viz
 >>>>>>> 8a0c86b (Refactored tarajectory tools (#3))
+=======
+>>>>>>> 866d1a1 (Refac debug tools (#5))
 ### Visualization Tools
 
 #### Plot Agent Statistics
