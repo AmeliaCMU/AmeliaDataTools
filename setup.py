@@ -15,5 +15,6 @@ setup(
         'scipy==1.9.1',
         "seaborn",
         "PyYAML",
+        "ipykernel",
     ]
 )
