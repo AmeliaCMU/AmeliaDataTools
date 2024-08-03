@@ -91,6 +91,7 @@
 
 ## How to use
 
+<<<<<<< HEAD
 ### Trajectory Tools
 
 #### Compute Agent Counts
@@ -138,6 +139,8 @@ python amelia_data_tools/trajectory_tools/compute_sequence_lengths.py
 
 The output will be saved in the `./output/stats/compute_sequence_lengths` directory.
 
+=======
+>>>>>>> refac_viz
 ### Visualization Tools
 
 #### Plot Agent Statistics
