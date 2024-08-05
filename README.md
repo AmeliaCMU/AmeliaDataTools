@@ -2,7 +2,7 @@
 
 ## Overview
 
-AmeliaDataTools is a
+AmeliaDataTools is a set of tools to process and visualize the Amelia dataset. It includes tools to compute agent counts, limits, motion profiles, and sequence lengths. It also includes tools to visualize agent statistics, trajectories, average distance, crowdedness, moving or static interpolated agents, motion profiles, and moving agents versus stationary agents. It includes tools to get crowdedness and movement statistics.
 
 ## Pre-requisites
 
