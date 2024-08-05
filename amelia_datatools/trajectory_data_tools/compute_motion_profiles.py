@@ -161,10 +161,6 @@ def run_processor(base_path, traj_version, to_process, drop_interp, agent_type, 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-<<<<<<< HEAD
-
-=======
->>>>>>> 8a0c86b (Refactored tarajectory tools (#3))
     parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
     parser.add_argument('--traj_version', type=str, default=VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
