@@ -1,18 +1,17 @@
-import scenario_identification.scene_utils.common as C
+import scene_utils.common as C
 from matplotlib.offsetbox import AnnotationBbox
 from tqdm import tqdm
-from itertools import groupby
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import pandas as pd
+import pickle
 import random
 random.seed(4242)
 np.set_printoptions(suppress=True)
 
 
 SUBDIR = __file__.split('/')[-1].split('.')[0]
-INT = '[INT]'
 
 
 def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
@@ -72,7 +71,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--airport', default="ksea", choices=["ksea", "kewr"])
-    parser.add_argument("--base_dir", type=str, default="../../datasets/amelia_v6/raw_trajectories")
+    parser.add_argument("--base_dir", type=str,
+                        default="../../datasets/amelia_v6/proc_trajectories")
     parser.add_argument("--out_dir", type=str, default="./out")
     args = parser.parse_args()
 
@@ -86,55 +86,72 @@ if __name__ == "__main__":
     print(f"Version: {version}")
 
     base_dir = os.path.join(args.base_dir, args.airport)
-    csv_files = [os.path.join(base_dir, f) for f in os.listdir(base_dir)]
+    sub_dirs = os.listdir(base_dir)
 
     total_agents = 0
     interp_agents = 0
     interp_T = []
     total_scenarios = 0
     curr_scenarios = 0
+    for sub_dir in tqdm(sub_dirs):
+        timestamp = sub_dir.split('_')[-1]
+        dir_ = os.path.join(base_dir, sub_dir)
+        scenarios = glob.glob(f"{dir_}/*.pkl", recursive=True)
+        total_scenarios += len(scenarios)
 
-    N = len(csv_files)
-    for n, csv_file in enumerate(csv_files):
-        # get file timestamp
-        timestamp = csv_file.split('/')[-1].split('.')[0].split('_')[-1]
-        data = pd.read_csv(csv_file)
+        temp_t = []
+        for s, scenario in enumerate(scenarios):
+            split = scenario.split("/")
+            subdir, scenario_id = split[-2], split[-1].split('.')[0]
 
-        agent_IDs = data.ID.unique().tolist()
-        total_agents += len(agent_IDs)
+            with open(scenario, 'rb') as f:
+                scene = pickle.load(f)
 
-        for agent_ID in agent_IDs:
-            agent_seq = data[:][data.ID == agent_ID]
-            agent_interp = agent_seq.Interp.to_numpy()
-            if INT in agent_interp:
-                x = (agent_interp == INT).astype(int).tolist()
-                grouped = (list(g) for _, g in groupby(enumerate(x), lambda t: t[1]))
-                for g in grouped:
-                    if g[0][1] == 1:
-                        t = 1 if len(g) == 1 else g[-1][0] - g[0][0]
-                        interp_T.append(t)
-                interp_agents += 1
+            seq = scene["sequences"]
+            N, _, _ = seq.shape
+            for n in range(N):
+                interp = seq[n, :, C.SEQ_IDX["Interp"]]
+                interp_idx = np.where(interp == 2.0)[0]
 
-        perc_interp = round(100 * interp_agents / total_agents, 4)
-        perc_files = round(100 * (n+1)/N, 4)
-        print(f"Interp. agents: {perc_interp}% Interp. files: {perc_files}%", end="\r")
+                if interp_idx.shape[0] == 1:
+                    temp_t.append(1)
+                    interp_agents += 1
 
-    perc_out = f"Percentage of interpolated agents: {perc_interp}%\n"
-    str_out = f"Total Files: {N}, Total Trajectories: {total_agents} Interp Traj: {interp_agents}\n"
-    print(str_out)
-    with open(f"{out_dir}/stats.txt", "w") as f:
-        f.write(str_out)
-        f.write(perc_out)
+                elif interp_idx.shape[0] > 1:
+                    interp_agents += 1
+                    dt = interp_idx[1:] - interp_idx[:-1]
+                    mask = np.asarray([True] + (dt[1:] != dt[:-1]).tolist() + [True])
+                    mask = np.where(mask == True)[0]
+                    if len(mask) < 2:
+                        breakpoint()
 
-    interp_T = np.asarray(interp_T)
-    plt.hist(interp_T, bins=60, range=(0, 60), label='Interpolated timesteps')
+                    for i in range(1, len(mask)):
+                        t2 = interp_idx[mask[i]]
+                        t1 = interp_idx[mask[i-1]]
+                        temp_t.append(t2 - t1)
+
+                else:
+                    total_agents += 1
+
+            curr_scenarios += 1
+            perc_int = round(int(100 * interp_agents / total_agents), 4)
+            processed_files = round(int(100 * curr_scenarios / total_scenarios), 4)
+            print(f"Interpolated agents {perc_int}% Proc scenarios: {processed_files}", end="\r")
+
+        if len(temp_t) > 0:
+            plt.hist(np.asarray(temp_t), bins=60, range=(0, 60), label='Interpolated timesteps')
+            plt.legend()
+            plt.savefig(f"{out_dir}/{args.airport}_{subdir}.png", dpi=600, bbox_inches='tight')
+            plt.close()
+            interp_T += temp_t
+
+    str_ = f"Total: {total_agents}, interp: {interp_agents}, scenarios: {total_scenarios}"
+    print(f"Total: {total_agents}, interp: {interp_agents}, scenarios: {total_scenarios}")
+
+    with open(f"{out_dir}/perc.txt", 'w') as f:
+        f.write(str_)
+
+    plt.hist(np.asarray(interp_T), bins=60, range=(0, 60), label='Interpolated timesteps')
     plt.legend()
     plt.savefig(f"{out_dir}/{args.airport}.png", dpi=600, bbox_inches='tight')
-    plt.close()
-
-    idx = np.where(interp_T >= 10)[0]
-    interp_T10 = interp_T[idx]
-    plt.hist(interp_T10, bins=60, range=(10, 60), label='Interpolated timesteps')
-    plt.legend()
-    plt.savefig(f"{out_dir}/{args.airport}_t10.png", dpi=600, bbox_inches='tight')
     plt.close()
