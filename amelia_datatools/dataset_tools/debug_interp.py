@@ -1,20 +1,20 @@
+import scene_utils.common as C
+from matplotlib.offsetbox import AnnotationBbox
+from tqdm import tqdm
 import glob
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pickle
-import random 
+import random
 random.seed(4242)
 np.set_printoptions(suppress=True)
 
-from tqdm import tqdm 
-
-from matplotlib.offsetbox import AnnotationBbox
-import scene_utils.common as C
 
 SUBDIR = __file__.split('/')[-1].split('.')[0]
 
-def plot_scene(scenario, assets, filetag, order_list = None, version = 'v5'):
+
+def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
     raster_map, hold_lines, graph_map, ll_extent, agents = assets
     north, east, south, west = ll_extent
 
@@ -22,12 +22,12 @@ def plot_scene(scenario, assets, filetag, order_list = None, version = 'v5'):
     fig, movement_plot = plt.subplots()
     # Display global map
     movement_plot.imshow(
-        raster_map, zorder=0, extent=[west, east, south, north], alpha=0.8, cmap='gray_r') 
-    
+        raster_map, zorder=0, extent=[west, east, south, north], alpha=0.8, cmap='gray_r')
+
     sequences = scenario['sequences']
     agent_types = scenario['agent_types']
 
-    N, T, D = sequences.shape 
+    N, T, D = sequences.shape
     for n in range(N):
         # Get heading at last point of trajectory
         heading = sequences[n, -1, C.SEQ_IDX['Heading']]
@@ -38,27 +38,26 @@ def plot_scene(scenario, assets, filetag, order_list = None, version = 'v5'):
         lon = sequences[n, :, C.SEQ_IDX['Lon']]
 
         img = C.plot_agent(agents[agent_type], heading, C.ZOOM[agent_type])
-        ab = AnnotationBbox(img, (lon[-1], lat[-1]), frameon=False) 
+        ab = AnnotationBbox(img, (lon[-1], lat[-1]), frameon=False)
         movement_plot.add_artist(ab)
-        movement_plot.plot(lon, lat, color='blue', lw=0.65) 
+        movement_plot.plot(lon, lat, color='blue', lw=0.65)
 
         if version == 'v5':
-            movement_plot.scatter(lon, lat, color='red', lw=0.65, s=2) 
+            movement_plot.scatter(lon, lat, color='red', lw=0.65, s=2)
 
         else:
             interp = sequences[n, :, C.SEQ_IDX['Interp']]
 
             # Place plane on last point of ground truth sequence
             if order_list is None:
-               
-                idx = np.where(interp == 0.0)[0]
-                movement_plot.scatter(lon[idx], lat[idx], color='red', lw=0.65, s=2) 
-                idx = np.where(interp == 1.0)[0]
-                movement_plot.scatter(lon[idx], lat[idx], color='orange', lw=0.65, s=3) 
-                idx = np.where(interp == 2.0)[0]
-                movement_plot.scatter(lon[idx], lat[idx], color='yellow', lw=0.65, s=5) 
 
-    
+                idx = np.where(interp == 0.0)[0]
+                movement_plot.scatter(lon[idx], lat[idx], color='red', lw=0.65, s=2)
+                idx = np.where(interp == 1.0)[0]
+                movement_plot.scatter(lon[idx], lat[idx], color='orange', lw=0.65, s=3)
+                idx = np.where(interp == 2.0)[0]
+                movement_plot.scatter(lon[idx], lat[idx], color='yellow', lw=0.65, s=5)
+
     # Get conflict points (Hold lines) and plot them on the map
     # hold_lines = pickle_map[pickle_map[:, MAP_IDX['SemanticID']] == 1]
     hold_lines_lon = hold_lines[:, C.MAP_IDX['LonStart']]
@@ -67,18 +66,20 @@ def plot_scene(scenario, assets, filetag, order_list = None, version = 'v5'):
 
     C.save(filetag)
 
+
 if __name__ == "__main__":
-    import argparse 
+    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--airport', default="ksea", choices=["ksea", "kewr"])
-    parser.add_argument("--base_dir", type=str, default="../../datasets/amelia_v6/proc_trajectories")
+    parser.add_argument("--base_dir", type=str,
+                        default="../../datasets/amelia_v6/proc_trajectories")
     parser.add_argument("--out_dir", type=str, default="./out")
     args = parser.parse_args()
 
     out_dir = os.path.join(args.out_dir, SUBDIR, args.airport)
     os.makedirs(out_dir, exist_ok=True)
 
-    map_dir = os.path.join(f"../../datasets/amelia_v5/maps/{args.airport}")    
+    map_dir = os.path.join(f"../../datasets/amelia_v5/maps/{args.airport}")
     assets = C.load_assets(map_dir=map_dir)
 
     version = args.base_dir.split('/')[3].split('_')[-1]
@@ -92,26 +93,26 @@ if __name__ == "__main__":
     interp_T = []
     total_scenarios = 0
     curr_scenarios = 0
-    for sub_dir in tqdm(sub_dirs): 
+    for sub_dir in tqdm(sub_dirs):
         timestamp = sub_dir.split('_')[-1]
         dir_ = os.path.join(base_dir, sub_dir)
         scenarios = glob.glob(f"{dir_}/*.pkl", recursive=True)
         total_scenarios += len(scenarios)
-        
+
         temp_t = []
         for s, scenario in enumerate(scenarios):
             split = scenario.split("/")
             subdir, scenario_id = split[-2], split[-1].split('.')[0]
 
-            with open(scenario,'rb') as f:
+            with open(scenario, 'rb') as f:
                 scene = pickle.load(f)
-            
+
             seq = scene["sequences"]
             N, _, _ = seq.shape
             for n in range(N):
                 interp = seq[n, :, C.SEQ_IDX["Interp"]]
                 interp_idx = np.where(interp == 2.0)[0]
-                
+
                 if interp_idx.shape[0] == 1:
                     temp_t.append(1)
                     interp_agents += 1
@@ -121,7 +122,7 @@ if __name__ == "__main__":
                     dt = interp_idx[1:] - interp_idx[:-1]
                     mask = np.asarray([True] + (dt[1:] != dt[:-1]).tolist() + [True])
                     mask = np.where(mask == True)[0]
-                    if len(mask) < 2: 
+                    if len(mask) < 2:
                         breakpoint()
 
                     for i in range(1, len(mask)):
@@ -136,7 +137,7 @@ if __name__ == "__main__":
             perc_int = round(int(100 * interp_agents / total_agents), 4)
             processed_files = round(int(100 * curr_scenarios / total_scenarios), 4)
             print(f"Interpolated agents {perc_int}% Proc scenarios: {processed_files}", end="\r")
-        
+
         if len(temp_t) > 0:
             plt.hist(np.asarray(temp_t), bins=60, range=(0, 60), label='Interpolated timesteps')
             plt.legend()

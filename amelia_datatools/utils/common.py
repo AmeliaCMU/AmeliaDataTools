@@ -21,6 +21,10 @@ GRAPH_DATA_DIR = os.path.join(f"{DATA_DIR}", "graph_data")
 # Global variables
 DPI = 600
 
+AIRCRAFT = 0
+VEHICLE = 1
+UNKNOWN = 2
+
 
 class AgentType(Enum):
     AIRCRAFT = 0
@@ -80,3 +84,41 @@ RAW_IDX = EasyDict({
 })
 
 KNOTS_2_MS = 1/1.94384
+
+SEQ_IDX = {
+    'Speed': 0,
+    'Heading': 1,
+    'Lat': 2,
+    'Lon': 3,
+    'Range': 4,
+    'Bearing': 5,
+    'x': 6,
+    'y': 7,
+    'z': 8,
+    'Interp': 9
+}
+
+XY = [False, False, False, False, False, False, True, True, False, False]
+LL = [False, False, True, True, False, False, False, False, False, False]
+
+MAP_IDX = {
+    'LatStart': 0,
+    'LonStart': 1,
+    'xStart': 2,
+    'yStart': 3,
+    'LatEnd': 4,
+    'LonEnd': 5,
+    'xEnd': 6,
+    'yEnd': 7,
+    'SemanticID': 8,
+    'OSMID': 9,
+}
+
+COLOR_MAP = {
+    'gt_hist': '#FF5A4C',
+    'gt_future': '#8B5FBF',
+    'holdline': "#0DD7EF",
+    'follower': "#EF0D5C",
+    'leader': "#93EF0D",
+    'invalid': "#000000"
+}
