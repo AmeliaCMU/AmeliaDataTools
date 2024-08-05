@@ -98,7 +98,7 @@
 `compute_agent_counts.py` computes the number of agents per timestep. Run the following command:
 
 ```bash
-python amelia_data_tools/trajectory_tools/compute_agent_counts.py
+python amelia_datatools/trajectory_tools/compute_agent_counts.py
 ```
 
 The output will be saved in the `./output/stats/compute_agent_counts` directory.
@@ -108,7 +108,7 @@ The output will be saved in the `./output/stats/compute_agent_counts` directory.
 `compute_limits.py` computes the limits of the airports anad updates them. Run the following command:
 
 ```bash
-python amelia_data_tools/trajectory_tools/compute_limits.py
+python amelia_datatools/trajectory_tools/compute_limits.py
 ```
 
 The output will be saved in the `./output/cache/compute_limits` directory.
@@ -118,7 +118,7 @@ The output will be saved in the `./output/cache/compute_limits` directory.
 `compute_motion_profiles.py` computes the motion profiles of the agents. Run the following command:
 
 ```bash
-python amelia_data_tools/trajectory_tools/compute_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --agent_type [agent_type]
+python amelia_datatools/trajectory_tools/compute_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --agent_type [agent_type]
 ```
 
 Where:
@@ -133,7 +133,7 @@ Where:
 `compute_sequence_lengths.py` computes the sequence lengths of the agents by aerport. Run the following command:
 
 ```bash
-python amelia_data_tools/trajectory_tools/compute_sequence_lengths.py
+python amelia_datatools/trajectory_tools/compute_sequence_lengths.py
 ```
 
 The output will be saved in the `./output/stats/compute_sequence_lengths` directory.
@@ -145,7 +145,7 @@ The output will be saved in the `./output/stats/compute_sequence_lengths` direct
 `plot_agent_stats.py` plots agents' statistics, it counts the number of agents per timesteps as well as the number of agents by type. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_agent_statistics.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_agent_statistics.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -162,7 +162,7 @@ The output will be saved in the `./output/visualization/plot_agent_stats` direct
 `plot_all_trajectories.py` plots the trajectories of the agents from the dataset onto the map. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_all_trajectories.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --dpi [dpi]
+python amelia_datatools/visualization_tools/plot_all_trajectories.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --dpi [dpi]
 ```
 
 Where:
@@ -180,7 +180,7 @@ The output will be saved in the `./output/visualization/plot_all_trajectories` d
 `plot_average_distance.py` plots the average distance between agents by timestamp. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_average_distance.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_average_distance.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -198,7 +198,7 @@ The output will be saved in the `./output/visualization/plot_average_distance` d
 `plot_crowdedness.py` plots the histogram of the airports crowdedness. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_crowdedness.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files] --process
+python amelia_datatools/visualization_tools/plot_crowdedness.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files] --process
 ```
 
 Where:
@@ -216,7 +216,7 @@ The output will be saved in the `./output/visualization/plot_crowdedness` direct
 `plot_interp_stats.py` plots the agents' statistics with the interpolated points. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_interp_stats.py --base_dir [base_dir] --traj_version [traj_version] --moving --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_interp_stats.py --base_dir [base_dir] --traj_version [traj_version] --moving --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -234,7 +234,7 @@ The output will be saved in the `./output/visualization/plot_interp_stats` direc
 `plot_motion_profiles.py` plots the motion profiles of the agents, they might be `acceleration`, `speed` or `heading`. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process --input_path [input_path] --motion_profile [motion_profile] --drop_interp --agent_type [agent_type] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process --input_path [input_path] --motion_profile [motion_profile] --drop_interp --agent_type [agent_type] --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -255,7 +255,7 @@ The output will be saved in the `./output/visualization/plot_motion_profiles` di
 `plot_moving_agent_stats.py` plots the moving agents versus the stationary agents. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_moving_agent_stats.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_moving_agent_stats.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -272,7 +272,7 @@ The output will be saved in the `./output/visualization/plot_moving_agent_stats`
 `plot_sequence_lengths.py` plots the sequence lengths of the agents. Run the following command:
 
 ```bash
-python amelia_data_tools/visualization_tools/plot_sequence_lengths.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_sequence_lengths.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
 ```
 
 Where:
@@ -281,3 +281,42 @@ Where:
 - `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
 - `[dpi]` is the resolution of the image. By default it is `600`.
 - `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+
+### Data Tools
+
+#### Get Crowdedness
+
+`get_peak_hour.py` gets the peak crowdedness of the airports by hour. Run the following command:
+
+```bash
+python amelia_datatools/todo/get_peak_hour.py --base_dir [base_dir] --traj_version [traj_version] --output_dir [output_dir] --airport [airport] --parallel
+```
+
+Where:
+
+- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
+- `[output_dir]` is the path to the output directory. By default it is `./output/crowdedness`.
+- `[airport]` is the airport to process. By default it is set to `all`.
+- `--parallel` is a flag to process the data in parallel. By default it is set to `True`.
+
+The output will be saved in the `./output/crowdedness` directory.
+
+
+#### Get Movement Statistics
+
+`get_movement_stats.py` gets the movement statistics of the agents. Run the following command:
+
+```bash
+python amelia_datatools/todo/get_movement_stats.py --base_dir [base_dir] --traj_version [traj_version] --output_dir [output_dir] --airport [airport] --parallel
+```
+
+Where:
+
+- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
+- `[output_dir]` is the path to the output directory. By default it is `./output/movement`.
+- `[airport]` is the airport to process. By default it is set to `all`.
+- `--parallel` is a flag to process the data in parallel. By default it is set to `True`.
+
+The output will be saved in the `./output/movement` directory.

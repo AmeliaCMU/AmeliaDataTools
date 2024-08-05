@@ -16,5 +16,10 @@ setup(
         "seaborn",
         "PyYAML",
         "ipykernel",
+        "imageio",
+        "opencv-python==4.7.0.72,<4.8",
+        "networkx",
+        "geopandas",
+        "contextily",
     ]
 )
