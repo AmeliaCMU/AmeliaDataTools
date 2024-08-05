@@ -1,6 +1,0 @@
-runway              #1fe984
-apron/stand area    #ed28f0
-blastpad            #eb4a4a
-taxiwaysegment      #6285cf
-holdline            #ff9b21
-other               #f05eee
