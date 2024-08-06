@@ -1,9 +1,4 @@
-import json
-import glob
-import matplotlib.pyplot as plt
-import numpy as np
 import os
-from easydict import EasyDict
 from tqdm import tqdm
 import pickle
 import amelia_datatools.utils.common as C
@@ -18,7 +13,7 @@ if __name__ == '__main__':
     parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input path')
     parser.add_argument('--traj_version', type=str, default=C.VERSION)
     parser.add_argument(
-        '--output_dir', default=f"{C.ROOT_DIR}/output/{get_file_name(__file__)}", type=str)
+        '--output_dir', default=f"{C.OUTPUT_DIR}/{get_file_name(__file__)}", type=str)
     parser.add_argument('--max_scenes', default=100, type=int)
     args = parser.parse_args()
 

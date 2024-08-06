@@ -6,11 +6,11 @@ from easydict import EasyDict
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.join(ROOT_DIR, "../..")
 ROOT_DIR = os.path.normpath(ROOT_DIR)
-OUT_DIR = os.path.join(ROOT_DIR, "output")
+OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
 
-VIS_DIR = os.path.join(f"{OUT_DIR}", "visualization")
-STATS_DIR = os.path.join(f"{OUT_DIR}", "statistics")
-CACHE_DIR = os.path.join(f"{OUT_DIR}", "cache")
+VIS_DIR = os.path.join(f"{OUTPUT_DIR}", "visualization")
+STATS_DIR = os.path.join(f"{OUTPUT_DIR}", "statistics")
+CACHE_DIR = os.path.join(f"{OUTPUT_DIR}", "cache")
 
 DATA_DIR = os.path.join(ROOT_DIR, "datasets/amelia")
 VERSION = "a10v08"

@@ -1,6 +1,6 @@
 from amelia_datatools.utils.utils import get_file_name
 # import amelia_datatools.utils.common as C
-from amelia_datatools.utils.common import VERSION, ROOT_DIR
+from amelia_datatools.utils.common import VERSION, DATA_DIR, OUTPUT_DIR
 # import scenario_identification.scene_utils.common as C
 from tqdm import tqdm
 from itertools import groupby
@@ -81,9 +81,9 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--airport', default="ksea", choices=["ksea", "kewr"])
-    parser.add_argument("--base_dir", type=str, default=f"{ROOT_DIR}/datasets/amelia")
+    parser.add_argument("--base_dir", type=str, default=f"{DATA_DIR}")
     parser.add_argument('--traj_version', default=VERSION)
-    parser.add_argument("--output_dir", type=str, default=f"{ROOT_DIR}/output")
+    parser.add_argument("--output_dir", type=str, default=f"{OUTPUT_DIR}")
     args = parser.parse_args()
 
     debug_interpolation(**vars(args))

@@ -4,7 +4,7 @@ import os
 import pickle
 import math
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP
+from amelia_datatools.utils import common as C
 
 
 def get_single_histogram(data, airport, color='#773344', bins=179, ax=None, limits=(None, None, None), title=None,
@@ -31,9 +31,9 @@ def get_single_histogram(data, airport, color='#773344', bins=179, ax=None, limi
 
 
 def create_histograms():
-    out_dir = "./output/count"
+    out_dir = f"{C.OUTPUT_DIR}/count"
     os.makedirs(out_dir, exist_ok=True)
-    airports = AIRPORT_COLORMAP.keys()
+    airports = C.AIRPORT_COLORMAP.keys()
     target = 'kbos'
     plotting_colors = {
         "ksea": "#682D63",

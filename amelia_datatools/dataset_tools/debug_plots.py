@@ -1,5 +1,3 @@
-from amelia_datatools.utils.common import MAP_IDX, SEQ_IDX, COLOR_MAP
-# import scenario_identification.scene_utils.common as C
 from matplotlib.offsetbox import AnnotationBbox
 import glob
 import matplotlib.pyplot as plt
@@ -8,16 +6,15 @@ import os
 import pickle
 import random
 
-
-from amelia_datatools.utils.common import VERSION, ROOT_DIR
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils.utils import get_file_name
-from amelia_datatools.utils.processor_utils import load_assets
+from amelia_scenes.splitting.dataset import load_assets
+from amelia_scenes.visualization.common import plot_agent
 
 
 def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
     raster_map, hold_lines, graph_map, ll_extent, agents = assets
-    print(ll_extent)
-    north, east, south, west = ll_extent
+    north, east, south, west, _, _ = ll_extent
 
     # Save states
     fig, movement_plot = plt.subplots()
@@ -31,12 +28,12 @@ def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
     N, T, D = sequences.shape
     for n in range(N):
         # Get heading at last point of trajectory
-        heading = sequences[n, -1, SEQ_IDX['Heading']]
+        heading = sequences[n, -1, C.SEQ_IDX['Heading']]
         agent_type = agent_types[n]
 
         # Get ground truth sequence in lat/lon
-        lat = sequences[n, :, SEQ_IDX['Lat']]
-        lon = sequences[n, :, SEQ_IDX['Lon']]
+        lat = sequences[n, :, C.SEQ_IDX['Lat']]
+        lon = sequences[n, :, C.SEQ_IDX['Lon']]
 
         img = plot_agent(agents[agent_type], heading, C.ZOOM[agent_type])
         ab = AnnotationBbox(img, (lon[-1], lat[-1]), frameon=False)
@@ -47,7 +44,7 @@ def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
             movement_plot.scatter(lon, lat, color='red', lw=0.65, s=2)
 
         else:
-            interp = sequences[n, :, SEQ_IDX['Interp']]
+            interp = sequences[n, :, C.SEQ_IDX['Interp']]
 
             # Place plane on last point of ground truth sequence
             if order_list is None:
@@ -63,7 +60,7 @@ def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
     # hold_lines = pickle_map[pickle_map[:, MAP_IDX['SemanticID']] == 1]
     hold_lines_lon = hold_lines[:, C.MAP_IDX['LonStart']]
     hold_lines_lat = hold_lines[:, C.MAP_IDX['LatStart']]
-    plt.scatter(hold_lines_lon, hold_lines_lat, color=COLOR_MAP['holdline'], s=5)
+    plt.scatter(hold_lines_lon, hold_lines_lat, color=C.COLOR_MAP['holdline'], s=5)
 
     # save(filetag)
 
@@ -73,18 +70,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--airport', default="kbos", choices=["ksea", "kewr"])
     parser.add_argument("--base_dir", type=str,
-                        default=f"{ROOT_DIR}/datasets/amelia")
-    parser.add_argument("--traj_version", type=str, default=VERSION)
-    parser.add_argument("--out_dir", type=str, default=f"{ROOT_DIR}/output")
-    parser.add_argument("--debug_dir", type=str, default=f"{ROOT_DIR}/output/cache")
+                        default=f"{C.DATA_DIR}")
+    parser.add_argument("--traj_version", type=str, default=C.VERSION)
+    parser.add_argument("--output_dir", type=str, default=f"{C.OUTPUT_DIR}")
+    parser.add_argument("--debug_dir", type=str, default=f"{C.OUTPUT_DIR}/cache")
     parser.add_argument("--num_dirs", type=int, default=4)
     parser.add_argument("--num_scenes", type=int, default=100)
     args = parser.parse_args()
     random.seed(42)
     np.set_printoptions(suppress=True)
+    plt.rcParams['font.size'] = 6
 
-    out_dir = os.path.join(args.out_dir, get_file_name(__file__), args.airport)
-    os.makedirs(out_dir, exist_ok=True)
+    output_dir = os.path.join(args.output_dir, get_file_name(__file__), args.airport)
+    os.makedirs(output_dir, exist_ok=True)
 
     assets = load_assets(args.base_dir, args.airport)
 
@@ -110,7 +108,7 @@ if __name__ == "__main__":
                 with open(scenario, 'rb') as f:
                     scene = pickle.load(f)
 
-                out = os.path.join(out_dir, timestamp)
+                out = os.path.join(output_dir, timestamp)
                 os.makedirs(out, exist_ok=True)
 
                 filetag = os.path.join(out, f"{scenario_id}_{args.traj_version}")
@@ -130,7 +128,7 @@ if __name__ == "__main__":
                 with open(scenario, 'rb') as f:
                     scene = pickle.load(f)
 
-                out = os.path.join(out_dir, timestamp)
+                out = os.path.join(output_dir, timestamp)
                 os.makedirs(out, exist_ok=True)
 
                 filetag = os.path.join(out, f"{scenario_id}_{args.traj_version}")
