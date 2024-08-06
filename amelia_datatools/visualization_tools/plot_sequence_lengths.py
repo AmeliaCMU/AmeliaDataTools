@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from amelia_datatools.utils.common import DPI, VERSION, VIS_DIR, AIRPORT_COLORMAP, DATA_DIR
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils import utils
 
 
@@ -16,14 +16,14 @@ def get_agent_type(agent_type_vals):
     return 'Unknown'
 
 
-def plot(base_dir: str, traj_version: str,  dpi: int, num_files: int):
+def plot(base_dir: str, traj_version: str,  dpi: int, num_files: int, output_dir: str):
     input_dir = os.path.join(base_dir, f"traj_data_{traj_version}", 'raw_trajectories')
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
     plt.rcParams['font.size'] = 6
 
-    airports = AIRPORT_COLORMAP.keys()
+    airports = C.AIRPORT_COLORMAP.keys()
     num_airports = len(airports)
 
     seqlens = {
@@ -57,12 +57,13 @@ def plot(base_dir: str, traj_version: str,  dpi: int, num_files: int):
     ncols = num_airports // 2
     fig, ax = plt.subplots(nrows, ncols, figsize=(8 * ncols, 8 * nrows), sharey=True, squeeze=True)
 
-    for na, (selected_airport, color) in enumerate(AIRPORT_COLORMAP.items()):
+    for na, (selected_airport, color) in enumerate(C.AIRPORT_COLORMAP.items()):
         print(f"Selected airport: {selected_airport}")
         for airport, data in seqlens.items():
 
             data = np.asarray(data)
-            alpha, zorder, color, label = 0.1, 1, AIRPORT_COLORMAP[airport.lower()], airport.upper()
+            alpha, zorder, color, label = 0.1, 1, C.AIRPORT_COLORMAP[airport.lower(
+            )], airport.upper()
             if airport.upper() == selected_airport.upper():
                 alpha, zorder = 0.7, 1000
 
@@ -109,10 +110,11 @@ def plot(base_dir: str, traj_version: str,  dpi: int, num_files: int):
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--traj_version', type=str, default=VERSION)
-    parser.add_argument('--dpi', type=int, default=DPI)
+    parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', type=str, default=C.VERSION)
+    parser.add_argument('--dpi', type=int, default=C.DPI)
     parser.add_argument('--num_files', type=int, default=-1)
+    parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
     plot(**vars(args))

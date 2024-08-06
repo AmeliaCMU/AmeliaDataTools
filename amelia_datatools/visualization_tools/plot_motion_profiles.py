@@ -1,15 +1,11 @@
 
 
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 import numpy as np
 import os
-import pandas as pd
 import pickle
-import seaborn as sns
 
-
-from amelia_datatools.utils.common import AIRPORT_COLORMAP, VIS_DIR, VERSION, DATA_DIR, DPI, MOTION_PROFILE, CACHE_DIR
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils import utils
 from amelia_datatools.utils.processor_utils import polar_histogram
 from amelia_datatools.trajectory_data_tools.compute_motion_profiles import run_processor
@@ -43,7 +39,7 @@ def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input
     bins = 80
     qlow, qupp = True, True
     fontcolor = 'dimgray'
-    num_airports = len(AIRPORT_COLORMAP.keys())
+    num_airports = len(C.AIRPORT_COLORMAP.keys())
     fig_width = 8  # Adjust as needed
     fig_height = fig_width * num_airports
 
@@ -66,7 +62,7 @@ def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input
             q_upper = np.quantile(data, 0.995)
             data = data[data <= q_upper]
 
-        _, _, color, label = 0.1, 1, AIRPORT_COLORMAP[airport], airport.upper()
+        _, _, color, label = 0.1, 1, C.AIRPORT_COLORMAP[airport], airport.upper()
         alpha, zorder = 1, 1000
         if (motion_profile == 'heading absolute'):
             polar_histogram(
@@ -89,7 +85,7 @@ def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input
             )
             ax[i].legend(loc='upper right', labelcolor=fontcolor, fontsize=20)
 
-    label, unit = MOTION_PROFILE[motion_profile]['label'], MOTION_PROFILE[motion_profile]['unit']
+    label, unit = C.MOTION_PROFILE[motion_profile]['label'], C.MOTION_PROFILE[motion_profile]['unit']
     ax[-1].set_xlabel(f'{label} ({unit})', color=fontcolor, fontsize=20)
     for a in ax:
         a.tick_params(color=fontcolor, labelcolor=fontcolor)
@@ -104,19 +100,18 @@ def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
-    input_path = os.path.join(CACHE_DIR, 'compute_motion_profiles')
     parser = ArgumentParser()
-    parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--traj_version', default=VERSION, type=str, help='Trajectory version')
+    parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', default=C.VERSION, type=str, help='Trajectory version')
     parser.add_argument('--to_process', default=1.0, type=float)
-    parser.add_argument('--input_path', default=input_path,
+    parser.add_argument('--input_path', default=f"{C.CACHE_DIR}/compute_motion_profiles",
                         type=str, help='Input path')
     parser.add_argument('--motion_profile', default='acceleration',
                         choices=['acceleration', 'speed', 'heading'])
     parser.add_argument('--drop_interp', action='store_true')
     parser.add_argument('--agent_type', default='aircraft',
                         choices=['aircraft', 'vehicle', 'unknown', 'all'])
-    parser.add_argument('--dpi', type=int, default=DPI)
+    parser.add_argument('--dpi', type=int, default=C.DPI)
     args = parser.parse_args()
 
     plot_vertical_hist(**vars(args))

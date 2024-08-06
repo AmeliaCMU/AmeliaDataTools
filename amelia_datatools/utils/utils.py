@@ -1,7 +1,7 @@
 import os
 import glob
-import numpy as np
 import matplotlib.pyplot as plt
+import glob
 import amelia_datatools.utils.common as C
 from amelia_scenes.visualization.common import plot_agent
 from matplotlib.offsetbox import AnnotationBbox
@@ -92,3 +92,13 @@ def save(filetag, dpi=400):
     # plt.show(block = False)
     plt.savefig(f'{filetag}.png', dpi=dpi, bbox_inches='tight')
     plt.close()
+
+
+def get_airport_list():
+    assets_dir = os.path.join(C.DATA_DIR, 'assets')
+    files = glob.glob(f"{assets_dir}/*")
+    airport_list = []
+    for file in files:
+        if os.path.isdir(file):
+            airport_list.append(os.path.basename(file))
+    return airport_list

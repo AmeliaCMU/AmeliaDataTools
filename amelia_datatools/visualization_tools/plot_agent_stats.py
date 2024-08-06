@@ -4,19 +4,19 @@ import os
 import pandas as pd
 from tqdm import tqdm
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP, VIS_DIR, DATA_DIR, VERSION, DPI
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils import utils
 
 
-def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
+def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir: str):
     input_dir = os.path.join(base_dir, f"traj_data_{traj_version}", 'raw_trajectories')
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
-    os.makedirs(out_dir, exist_ok=True)
-    print(f"Created output directory in: {out_dir}")
+    output_dir = os.path.join(f"{output_dir}", utils.get_file_name(__file__))
+    os.makedirs(output_dir, exist_ok=True)
+    print(f"Created output directory in: {output_dir}")
 
     plt.rcParams['font.size'] = 6
 
-    num_airports = len(AIRPORT_COLORMAP.keys())
+    num_airports = len(C.AIRPORT_COLORMAP.keys())
 
     agent_counts = {}
     agent_types = {
@@ -24,7 +24,7 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
         'Vehicle': [0 for _ in range(num_airports)],
         'Unknown': [0 for _ in range(num_airports)],
     }
-    for i, airport in enumerate(AIRPORT_COLORMAP.keys()):
+    for i, airport in enumerate(C.AIRPORT_COLORMAP.keys()):
         airport_up = airport.upper()
         print(f"Running airport: {airport_up}")
         agent_counts[airport_up] = []
@@ -60,7 +60,7 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
     airports = agent_counts.keys()
     counts = [np.asarray(c).sum() for c in agent_counts.values()]
     bar_labels = agent_counts.values()
-    bar_colors = AIRPORT_COLORMAP.values()
+    bar_colors = C.AIRPORT_COLORMAP.values()
 
     ax.bar(airports, counts, color=bar_colors)
     ax.set_ylabel('Num. of Agents', color=fontcolor, fontsize=10)
@@ -70,14 +70,14 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
         spine.set_edgecolor(fontcolor)
 
     # ax.legend()
-    plt.savefig(f"{out_dir}/unique_agents.png", dpi=dpi, bbox_inches='tight')
+    plt.savefig(f"{output_dir}/unique_agents.png", dpi=dpi, bbox_inches='tight')
     plt.close()
 
     # Plot agent type
     fig, ax = plt.subplots()
     fontcolor = 'dimgray'
     airports = agent_counts.keys()
-    bar_colors = AIRPORT_COLORMAP.values()
+    bar_colors = C.AIRPORT_COLORMAP.values()
 
     # the label locations
     x = np.arange(len(airports))
@@ -107,7 +107,7 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int):
         spine.set_edgecolor(fontcolor)
 
     # ax.legend()
-    plt.savefig(f"{out_dir}/agent_types.png", dpi=dpi, bbox_inches='tight')
+    plt.savefig(f"{output_dir}/agent_types.png", dpi=dpi, bbox_inches='tight')
     plt.close()
 
 
@@ -116,10 +116,11 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument(
-        '--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--traj_version', default=VERSION, type=str)
-    parser.add_argument('--dpi', type=int, default=DPI)
+        '--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', default=C.VERSION, type=str)
+    parser.add_argument('--dpi', type=int, default=C.DPI)
     parser.add_argument('--num_files', type=int, default=-1)
+    parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
     plot(**vars(args))

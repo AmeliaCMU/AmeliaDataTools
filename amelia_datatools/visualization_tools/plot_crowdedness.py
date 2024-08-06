@@ -5,7 +5,7 @@ import pickle
 
 from tqdm import tqdm
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP, VIS_DIR, CACHE_DIR, DPI, DATA_DIR, VERSION
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils import utils
 
 
@@ -17,15 +17,14 @@ def get_agent_type(agent_type_vals):
     return 'Unknown'
 
 
-def get_crowdedness(base_dir: str, traj_version: str, num_files):
+def get_crowdedness(base_dir: str, traj_version: str, num_files: int, output_dir: str):
     input_dir = os.path.join(base_dir, f"traj_data_{traj_version}", 'raw_trajectories')
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
-    os.makedirs(out_dir, exist_ok=True)
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
+    os.makedirs(output_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
     plt.rcParams['font.size'] = 6
 
-    airports = AIRPORT_COLORMAP.keys()
-    num_airports = len(airports)
+    airports = C.AIRPORT_COLORMAP.keys()
 
     crowdedness = {
 
@@ -52,10 +51,10 @@ def get_crowdedness(base_dir: str, traj_version: str, num_files):
     return crowdedness
 
 
-def plot(input_path: str, dpi: int, num_files: int):
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+def plot(input_path: str, dpi: int, num_files: int, output_dir: str):
+    out_dir = os.path.join(out_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
-    airports = AIRPORT_COLORMAP.keys()
+    airports = C.AIRPORT_COLORMAP.keys()
     num_airports = len(airports)
 
     crowdedness = {
@@ -89,11 +88,12 @@ def plot(input_path: str, dpi: int, num_files: int):
     ncols = num_airports // 2
     fig, ax = plt.subplots(nrows, ncols, figsize=(9 * ncols, 8 * nrows), sharey=True, squeeze=True)
 
-    for na, (selected_airport, color) in enumerate(AIRPORT_COLORMAP.items()):
+    for na, (selected_airport, color) in enumerate(C.AIRPORT_COLORMAP.items()):
         print(f"Selected airport: {selected_airport}")
         for airport, data in crowdedness.items():
 
-            alpha, zorder, color, label = 0.1, 1, AIRPORT_COLORMAP[airport.lower()], airport.upper()
+            alpha, zorder, color, label = 0.1, 1, C.AIRPORT_COLORMAP[airport.lower(
+            )], airport.upper()
             if airport.upper() == selected_airport.upper():
                 alpha, zorder = 0.7, 1000
 
@@ -129,11 +129,11 @@ def plot(input_path: str, dpi: int, num_files: int):
     plt.savefig(f"{out_dir}/crowded.png", dpi=dpi, bbox_inches='tight')
 
 
-def plot_vertical(input_path: str, dpi: int):
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+def plot_vertical(input_path: str, dpi: int, output_dir: str):
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
-    airports = AIRPORT_COLORMAP.keys()
+    airports = C.AIRPORT_COLORMAP.keys()
     num_airports = len(airports)
 
     with open(input_path, 'rb') as f:
@@ -152,7 +152,7 @@ def plot_vertical(input_path: str, dpi: int):
 
     for i, (airport, data) in enumerate(crowdedness.items()):
 
-        _, _, color, label = 0.1, 1, AIRPORT_COLORMAP[airport.lower()], airport.upper()
+        _, _, color, label = 0.1, 1, C.AIRPORT_COLORMAP[airport.lower()], airport.upper()
 
         freq, bins, patches = ax[i].hist(
             data,
@@ -165,20 +165,6 @@ def plot_vertical(input_path: str, dpi: int):
             label=label,
             zorder=zorder
         )
-
-        # boxprops = dict(facecolor=color)
-        # whiskerprops = dict(color=fontcolor)
-        # capprops = dict(color="red")
-        # flierprops = dict(marker="o", color="purple", markersize=5)
-        # medianprops = dict(color="orange")
-
-        # ax[i].boxplot(
-        #     data,
-        #     vert = True,
-        #     patch_artist = True,
-        #     boxprops = boxprops,
-        #     whiskerprops = whiskerprops
-        #     )
 
         ax[i].legend(
             loc='upper right', labelcolor=fontcolor, fontsize=16, ncols=2)
@@ -201,21 +187,23 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument(
-        '--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--traj_version', default=VERSION, type=str)
-    parser.add_argument('--dpi', type=int, default=DPI)
+        '--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', default=C.VERSION, type=str)
+    parser.add_argument('--dpi', type=int, default=C.DPI)
     parser.add_argument('--num_files', type=int, default=-1)
     parser.add_argument('--process', action='store_true')
+    parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
-    cache_dir = os.path.join(CACHE_DIR, utils.get_file_name(__file__))
+    cache_dir = os.path.join(C.CACHE_DIR, utils.get_file_name(__file__))
     os.makedirs(cache_dir, exist_ok=True)
     cahe_file = os.path.join(cache_dir, f'crowdedness.pkl')
     if (args.process):
         crowdedness = get_crowdedness(base_dir=args.base_dir,
                                       traj_version=args.traj_version,
-                                      num_files=args.num_files)
+                                      num_files=args.num_files,
+                                      output_dir=args.output_dir)
         with open(cahe_file, 'wb') as f:
             pickle.dump(crowdedness, f)
 
-    plot_vertical(input_path=cahe_file, dpi=args.dpi)
+    plot_vertical(input_path=cahe_file, dpi=args.dpi, output_dir=args.output_dir)
