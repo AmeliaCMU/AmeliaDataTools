@@ -21,8 +21,8 @@ def generate_bin_edges(num_bins, min_value, max_value):
     return bin_edges
 
 
-def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input_path: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int):
-    out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input_path: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int, output_dir: str):
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
 
@@ -112,6 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('--agent_type', default='aircraft',
                         choices=['aircraft', 'vehicle', 'unknown', 'all'])
     parser.add_argument('--dpi', type=int, default=C.DPI)
+    parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
     plot_vertical_hist(**vars(args))

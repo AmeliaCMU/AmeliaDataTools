@@ -18,7 +18,7 @@ def get_agent_type(agent_type_vals):
 
 def plot(base_dir: str, traj_version: str, dpi: int, num_files: int, output_dir: str):
     input_dir = os.path.join(base_dir, f"traj_data_{traj_version}", 'raw_trajectories')
-    out_dir = os.path.join(out_dir, utils.get_file_name(__file__))
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
 
