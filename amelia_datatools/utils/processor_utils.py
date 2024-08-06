@@ -160,39 +160,41 @@ def polar_histogram(ax, data, color, bins=80, density=False, offset=0, allow_gap
     return n, bins, patches
 
 
-def load_assets(input_dir: str, airport: str) -> tuple:
-    # Graph
-    graph_data_dir = os.path.join(input_dir, "graph_data_a10v01os", airport)
-    print(f"Loading graph data from: {graph_data_dir}")
-    pickle_map_filepath = os.path.join(graph_data_dir, "semantic_graph.pkl")
-    with open(pickle_map_filepath, 'rb') as f:
-        graph_pickle = pickle.load(f)
-        hold_lines = graph_pickle['hold_lines']
-        graph_nx = graph_pickle['graph_networkx']
-        # pickle_map = temp_dict['map_infos']['all_polylines'][:]
+#
+# TODO: delete deprecated function
+# def load_assets(input_dir: str, airport: str) -> tuple:
+#     # Graph
+#     graph_data_dir = os.path.join(input_dir, "graph_data_a10v01os", airport)
+#     print(f"Loading graph data from: {graph_data_dir}")
+#     pickle_map_filepath = os.path.join(graph_data_dir, "semantic_graph.pkl")
+#     with open(pickle_map_filepath, 'rb') as f:
+#         graph_pickle = pickle.load(f)
+#         hold_lines = graph_pickle['hold_lines']
+#         graph_nx = graph_pickle['graph_networkx']
+#         # pickle_map = temp_dict['map_infos']['all_polylines'][:]
 
-    assets_dir = os.path.join(input_dir, "assets")
-    print(f"Loading assets from: {assets_dir}")
+#     assets_dir = os.path.join(input_dir, "assets")
+#     print(f"Loading assets from: {assets_dir}")
 
-    # Map asset
-    raster_map_filepath = os.path.join(assets_dir, airport, "bkg_map.png")
-    raster_map = cv2.imread(raster_map_filepath)
-    raster_map = cv2.resize(
-        raster_map, (raster_map.shape[0]//2, raster_map.shape[1]//2))
-    raster_map = cv2.cvtColor(raster_map, cv2.COLOR_BGR2RGB)
+#     # Map asset
+#     raster_map_filepath = os.path.join(assets_dir, airport, "bkg_map.png")
+#     raster_map = cv2.imread(raster_map_filepath)
+#     raster_map = cv2.resize(
+#         raster_map, (raster_map.shape[0]//2, raster_map.shape[1]//2))
+#     raster_map = cv2.cvtColor(raster_map, cv2.COLOR_BGR2RGB)
 
-    # Reference file
-    limits_filepath = os.path.join(assets_dir, airport, 'limits.json')
-    with open(limits_filepath, 'r') as fp:
-        ref_data = EasyDict(json.load(fp))
-    alt = ref_data.limits.Altitude
-    espg = ref_data.espg_4326
-    limits = (espg.north, espg.east, espg.south, espg.west, alt.min, alt.max)
+#     # Reference file
+#     limits_filepath = os.path.join(assets_dir, airport, 'limits.json')
+#     with open(limits_filepath, 'r') as fp:
+#         ref_data = EasyDict(json.load(fp))
+#     alt = ref_data.limits.Altitude
+#     espg = ref_data.espg_4326
+#     limits = (espg.north, espg.east, espg.south, espg.west, alt.min, alt.max)
 
-    # Agent assets
-    agents = {
-        AIRCRAFT: imageio.imread(os.path.join(assets_dir, "ac.png")),
-        VEHICLE: imageio.imread(os.path.join(assets_dir, "vc.png")),
-        UNKNOWN: imageio.imread(os.path.join(assets_dir, "uk_ac.png"))
-    }
-    return raster_map, hold_lines, graph_nx, limits, agents
+#     # Agent assets
+#     agents = {
+#         AIRCRAFT: imageio.imread(os.path.join(assets_dir, "ac.png")),
+#         VEHICLE: imageio.imread(os.path.join(assets_dir, "vc.png")),
+#         UNKNOWN: imageio.imread(os.path.join(assets_dir, "uk_ac.png"))
+#     }
+#     return raster_map, hold_lines, graph_nx, limits, agents

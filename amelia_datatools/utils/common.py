@@ -25,6 +25,12 @@ AIRCRAFT = 0
 VEHICLE = 1
 UNKNOWN = 2
 
+ZOOM = {
+    AIRCRAFT: 0.015,
+    VEHICLE: 0.2,
+    UNKNOWN: 0.015
+}
+
 
 class AgentType(Enum):
     AIRCRAFT = 0
