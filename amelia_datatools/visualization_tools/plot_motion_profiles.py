@@ -21,7 +21,7 @@ def generate_bin_edges(num_bins, min_value, max_value):
     return bin_edges
 
 
-def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input_path: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int, output_dir: str):
+def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input_path: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int, output_dir: str, overlay: bool):
     out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
     os.makedirs(out_dir, exist_ok=True)
     print(f"Created output directory in: {out_dir}")
@@ -98,6 +98,79 @@ def plot_vertical_hist(base_dir: str, traj_version: str, to_process: bool, input
     plt.savefig(f"{out_dir}/{base_file}.png", dpi=dpi, bbox_inches='tight')
 
 
+# def plot(ipath: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int):
+def plot(base_dir: str, traj_version: str, to_process: bool, input_path: str, motion_profile: str, drop_interp: bool, agent_type: bool, dpi: int, output_dir: str, overlay: bool):
+
+    out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
+    os.makedirs(out_dir, exist_ok=True)
+    print(f"Created output directory in: {out_dir}")
+
+    suffix = '_dropped_int' if drop_interp else ''
+    suffix += f'_{agent_type}'
+    base_file = f"{motion_profile}_profiles{suffix}"
+    input_file = os.path.join(input_path, f"{base_file}.pkl")
+
+    with open(input_file, 'rb') as f:
+        x = pickle.load(f)
+
+    bins = 80
+    fontcolor = 'dimgray'
+    qlow, qupp = True, True
+
+    nrows = 2
+    num_airports = len(C.AIRPORT_COLORMAP.keys())
+    ncols = num_airports // 2
+    fig, ax = plt.subplots(nrows, ncols, figsize=(8 * ncols, 8 * nrows), sharey=True, squeeze=True)
+
+    for na, (selected_airport, color) in enumerate(C.AIRPORT_COLORMAP.items()):
+        for airport, data in x.items():
+            # print(f"Selected: {selected_airport}, Current: {airport}, Data: {data.shape}")
+            # ax[na].set_xlabel('𝚫Vel (㎨)', color=fontcolor, fontsize=20)
+            data = data['mean']
+
+            if qlow:
+                q_lower = np.quantile(data, 0.005)
+                data = data[data >= q_lower]
+
+            if qupp:
+                q_upper = np.quantile(data, 0.995)
+                data = data[data <= q_upper]
+
+            alpha, zorder, color, label = 0.1, 1, C.AIRPORT_COLORMAP[airport], airport.upper()
+            if airport == selected_airport:
+                alpha, zorder = 0.7, 1000
+
+            i, j = 0, na
+            if na > ncols-1:
+                i, j = 1, na - 1 - ncols
+            freq, bins, patches = ax[i, j].hist(
+                data,
+                bins=bins,
+                color=color,
+                # edgecolor=fontcolor,
+                linewidth=0.1,
+                alpha=alpha,
+                # density=True,
+                label=label,
+                zorder=zorder
+            )
+
+        ax[i, j].legend(loc='upper right', labelcolor=fontcolor, fontsize=20)
+
+    ax[0, 0].set_ylabel('Frequency', color=fontcolor, fontsize=20)
+    ax[0, 0].ticklabel_format(style='sci', scilimits=(0, 3), axis='both')
+    ax[1, 0].set_ylabel('Frequency', color=fontcolor, fontsize=20)
+    ax[1, 0].ticklabel_format(style='sci', scilimits=(0, 3), axis='both')
+    for a in ax.reshape(-1):
+        a.tick_params(color=fontcolor, labelcolor=fontcolor)
+        for spine in a.spines.values():
+            spine.set_edgecolor(fontcolor)
+            a.yaxis.set_tick_params(labelsize=20)
+            a.xaxis.set_tick_params(labelsize=20)
+    plt.subplots_adjust(wspace=0.05, hspace=0)
+    plt.savefig(f"{out_dir}/{base_file}_overlay.png", dpi=dpi, bbox_inches='tight')
+
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
@@ -113,6 +186,10 @@ if __name__ == '__main__':
                         choices=['aircraft', 'vehicle', 'unknown', 'all'])
     parser.add_argument('--dpi', type=int, default=C.DPI)
     parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
+    parser.add_argument('--overlay', action='store_true', default=False)
     args = parser.parse_args()
 
-    plot_vertical_hist(**vars(args))
+    if args.overlay:
+        plot(**vars(args))
+    else:
+        plot_vertical_hist(**vars(args))
