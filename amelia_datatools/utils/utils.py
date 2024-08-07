@@ -1,6 +1,5 @@
 import os
 import glob
-
 import matplotlib.pyplot as plt
 import glob
 
@@ -104,4 +103,3 @@ def get_airport_list():
         if os.path.isdir(file):
             airport_list.append(os.path.basename(file))
     return airport_list
-
