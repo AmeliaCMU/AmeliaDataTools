@@ -6,11 +6,11 @@ from easydict import EasyDict
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.join(ROOT_DIR, "../..")
 ROOT_DIR = os.path.normpath(ROOT_DIR)
-OUT_DIR = os.path.join(ROOT_DIR, "output")
+OUTPUT_DIR = os.path.join(ROOT_DIR, "output")
 
-VIS_DIR = os.path.join(f"{OUT_DIR}", "visualization")
-STATS_DIR = os.path.join(f"{OUT_DIR}", "statistics")
-CACHE_DIR = os.path.join(f"{OUT_DIR}", "cache")
+VIS_DIR = os.path.join(f"{OUTPUT_DIR}", "visualization")
+STATS_DIR = os.path.join(f"{OUTPUT_DIR}", "statistics")
+CACHE_DIR = os.path.join(f"{OUTPUT_DIR}", "cache")
 
 DATA_DIR = os.path.join(ROOT_DIR, "datasets/amelia")
 VERSION = "a10v08"
@@ -24,6 +24,12 @@ DPI = 600
 AIRCRAFT = 0
 VEHICLE = 1
 UNKNOWN = 2
+
+ZOOM = {
+    AIRCRAFT: 0.015,
+    VEHICLE: 0.2,
+    UNKNOWN: 0.015
+}
 
 
 class AgentType(Enum):
@@ -121,4 +127,11 @@ COLOR_MAP = {
     'follower': "#EF0D5C",
     'leader': "#93EF0D",
     'invalid': "#000000"
+}
+
+AIRPORTS = {
+    "kmdw": "#0072bb",
+    "kewr": "#519872",
+    "ksea": "#682D63",
+    "kbos": "#ca3c25"
 }
