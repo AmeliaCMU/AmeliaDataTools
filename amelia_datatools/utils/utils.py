@@ -1,7 +1,9 @@
 import os
 import glob
+
 import matplotlib.pyplot as plt
 import glob
+
 import amelia_datatools.utils.common as C
 from amelia_scenes.visualization.common import plot_agent
 from matplotlib.offsetbox import AnnotationBbox
@@ -102,3 +104,4 @@ def get_airport_list():
         if os.path.isdir(file):
             airport_list.append(os.path.basename(file))
     return airport_list
+
