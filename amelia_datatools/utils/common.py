@@ -128,3 +128,10 @@ COLOR_MAP = {
     'leader': "#93EF0D",
     'invalid': "#000000"
 }
+
+AIRPORTS = {
+    "kmdw": "#0072bb",
+    "kewr": "#519872",
+    "ksea": "#682D63",
+    "kbos": "#ca3c25"
+}

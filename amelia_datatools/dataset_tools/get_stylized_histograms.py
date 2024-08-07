@@ -73,7 +73,7 @@ def create_histograms():
         plt.tight_layout()
         plt.legend()
         plt.show(block=False)
-        plt.savefig(f'{out_dir}/all_{key}.png', dpi=800)
+        plt.savefig(f'{out_dir}/all_{key}.png', dpi=C.DPI)
         plt.close()
 
 

@@ -1,7 +1,5 @@
 from amelia_datatools.utils.utils import get_file_name
-# import amelia_datatools.utils.common as C
 from amelia_datatools.utils.common import VERSION, DATA_DIR, OUTPUT_DIR
-# import scenario_identification.scene_utils.common as C
 from tqdm import tqdm
 from itertools import groupby
 import matplotlib.pyplot as plt

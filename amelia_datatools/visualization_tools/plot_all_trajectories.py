@@ -8,18 +8,19 @@ import random
 from pyproj import Transformer
 from easydict import EasyDict
 from tqdm import tqdm
+import glob
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP, VIS_DIR, DATA_DIR, VERSION, ROOT_DIR, DPI
+from amelia_datatools.utils import common as C
 from amelia_datatools.utils import utils
 from amelia_datatools.utils.processor_utils import transform_extent
 
 
 class TrajectoryProcessor():
     def __init__(
-            self, airport: str, base_dir: str, traj_version: str, to_process: float, dpi: int, drop_interp: bool):
+            self, airport: str, base_dir: str, traj_version: str, to_process: float, dpi: int, drop_interp: bool, output_dir: str):
         self.base_dir = base_dir
 
-        self.out_dir = os.path.join(VIS_DIR, utils.get_file_name(__file__))
+        self.out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
 
         self.airport = airport
         self.dpi = dpi
@@ -79,8 +80,8 @@ class TrajectoryProcessor():
             data = data[:][data['Type'] == 0]
             lon, lat = np.array(data.Lon.values), np.array(data.Lat.values)
 
-            if self.airport in AIRPORT_COLORMAP.keys():
-                color = AIRPORT_COLORMAP[self.airport]
+            if self.airport in C.AIRPORT_COLORMAP.keys():
+                color = C.AIRPORT_COLORMAP[self.airport]
             else:
                 color = np.random.rand(3,)
 
@@ -137,21 +138,17 @@ class TrajectoryProcessor():
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--traj_version', type=str, default=VERSION)
+    parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--traj_version', type=str, default=C.VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')
-    parser.add_argument('--dpi', type=int, default=DPI)
+    parser.add_argument('--dpi', type=int, default=C.DPI)
+    parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
-    airports_path = os.path.join(ROOT_DIR, 'amelia_datatools', 'utils', 'airports.txt')
-    with open(airports_path, 'r') as f:
-        airport_list_raw = f.readlines()
-
-    airport_list = [airport.strip().lower() for airport in airport_list_raw]
+    airport_list = utils.get_airport_list()
 
     for airport in tqdm(airport_list):
-        if os.path.exists(os.path.join(args.base_dir, 'assets', airport)):
-            args.airport = airport
-            processor = TrajectoryProcessor(**vars(args))
-            processor.plot_trajectories()
+        args.airport = airport
+        processor = TrajectoryProcessor(**vars(args))
+        processor.plot_trajectories()
