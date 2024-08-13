@@ -1,6 +1,5 @@
 from amelia_datatools.utils.utils import get_file_name
 from amelia_datatools.utils.common import VERSION, DATA_DIR, OUTPUT_DIR
-from tqdm import tqdm
 from itertools import groupby
 import matplotlib.pyplot as plt
 import numpy as np

@@ -1,25 +1,45 @@
 # AmeliaDataTools
 
+This repository contains the data tools code for the model introduced in the paper below:
+
+***Amelia: A Large Dataset and Model for Airport Surface Movement Forecasting [[paper](https://arxiv.org/pdf/2407.21185)]***
+
+[Ingrid Navarro](https://navars.xyz) *, [Pablo Ortega-Kral](https://paok-2001.github.io) *, [Jay Patrikar](https://www.jaypatrikar.me) *, Haichuan Wang,
+Zelin Ye, Jong Hoon Park, [Jean Oh](https://cmubig.github.io/team/jean_oh/) and [Sebastian Scherer](https://theairlab.org/team/sebastian/)
+
 ## Overview
 
-AmeliaDataTools is a set of tools to process and visualize the Amelia dataset. It includes tools to compute agent counts, limits, motion profiles, and sequence lengths. It also includes tools to visualize agent statistics, trajectories, average distance, crowdedness, moving or static interpolated agents, motion profiles, and moving agents versus stationary agents. It includes tools to get crowdedness and movement statistics.
+**AmeliaDataTools**: Set of tools to process and visualize the Amelia dataset. It includes tools to compute agent counts, limits, motion profiles, and sequence lengths. It also includes tools to visualize agent statistics, trajectories, average distance, crowdedness, moving or static interpolated agents, motion profiles, and moving agents versus stationary agents. It includes tools to get crowdedness and movement statistics.
 
 ## Pre-requisites
 
 ### Dataset
 
-To run this repository, you first need to download the amelia dataset. Follow the instructions [here](https://github.com/AmeliaCMU/AmeliaScenes/DATASET.md) to download and setup the dataset.
+To run this repository, you first need to download the amelia dataset. Follow the instructions [here](https://ameliacmu.github.io/amelia-dataset/) to download the dataset.
 
 Once downloaded, create a symbolic link into  `datasets`:
 
 ```bash
 cd datasets
-ln -s /path/to/the/amelia/dataset .
+ln -s /path/to/amelia .
 ```
 
 ### Installation
 
-This repository requires the AmeliaTF, it can be installed following the instructions [here](https://github.com/AmeliaCMU/AmeliaTF/INSTALL.md). Once installed, in the same e the. However, you can do so following the instructions [here](https://github.com/AmeliaCMU/AmeliaScenes/INSTALL.md)
+Make sure that you have [conda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) installed.
+
+**Recommended:** Use the  [`install.sh`](https://github.com/AmeliaCMU/AmeliaScenes/blob/main/install.sh) to download and install the Amelia Framework:
+
+```bash
+chmod +x install.sh
+./install.sh amelia
+```
+
+This will create a conda environment named `amelia` and install all dependencies.
+
+Alternatively, refer to [`INSTALL.md`](https://github.com/AmeliaCMU/AmeliaScenes/blob/main/INSTALL.md) for manual installation.
+
+**Note:** AmeliaDataTools requires the Amelia dataset and AmeliaScenes dependencies to run, only refer to AmeliaDataTools' and AmeliaScenes' installation.
 
 ## How to use
 
@@ -28,36 +48,6 @@ Activate your amelia environment (**Please follow the installation instructions 
 ```bash
 conda activate amelia
 ```
-
-Run the testing script:
-
-```bash
-python run_inference.py -m test=[test_name]
-```
-
-Where `[test_name]` is the name of the test to run. The tests files are in a `yaml` format and are located in the `configs/test` directory. The default test is `default.yaml`. The test files contain the configuration for the test, including the model, the dataloader, the dataset, the device, the seed, and the output directory.
-
-For some quick changes you may refer to hydras' [documentation](https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run/). The next example shows how to change the test file to `example_kbos_critical.yaml`, which is a test file that uses the KBOS dataset and the critical model and it is included in th erepository as an example.
-
-```bash
-python run_inference.py -m test=example_kbos_critical
-```
-
-Giving the following output in the `output` directory:
-
-```bash
-output
-  |-- KBOS_26_1672610400_critical_ego
-    |-- .hyra
-    |-- kbos_scene_*.png
-  |-- KBOS_26_1672621200_critical_ego
-    |-- .hyra
-    |-- kbos_scene_*.png
-
-```
-
-
-## How to use
 
 ### Trajectory Tools
 
@@ -73,7 +63,7 @@ The output will be saved in the `./output/stats/compute_agent_counts` directory.
 
 #### Compute Limits
 
-`compute_limits.py` computes the limits of the airports anad updates them. Run the following command:
+`compute_limits.py` computes the limits of the airports and updates them. Run the following command:
 
 ```bash
 python amelia_datatools/trajectory_tools/compute_limits.py
@@ -86,21 +76,26 @@ The output will be saved in the `./output/cache/compute_limits` directory.
 `compute_motion_profiles.py` computes the motion profiles of the agents. Run the following command:
 
 ```bash
-python amelia_datatools/trajectory_tools/compute_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --agent_type [agent_type]
+python amelia_datatools/trajectory_tools/compute_motion_profiles.py \
+        --base_dir <base_dir> \
+        --traj_version <traj_version> \
+        --to_process <to_process> \
+        --drop_interp \
+        --agent_type <agent_type>
 ```
 
 Where:
 
 - `KBOS_26_1672610400_critical_ego` and `KBOS_26_1672621200_critical_ego` are the directories with the specifications configured in the `example_kbos_critical.yaml` file.
 - `kbos_scene_*.png` files are the images with the predictions generated by the model for each scene.
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[to_process]` is the percentage of files to process. By default it is set to `1.0`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<to_process>` is the percentage of files to process. By default it is set to `1.0`.
 - `--drop_interp` is a flag to drop the interpolated points. By default it is set to `False`.
 
 #### Compute Sequence Lengths
 
-`compute_sequence_lengths.py` computes the sequence lengths of the agents by aerport. Run the following command:
+`compute_sequence_lengths.py` computes the sequence lengths of the agents by airport. Run the following command:
 
 ```bash
 python amelia_datatools/trajectory_tools/compute_sequence_lengths.py
@@ -115,15 +110,19 @@ The output will be saved in the `./output/stats/compute_sequence_lengths` direct
 `plot_agent_stats.py` plots agents' statistics, it counts the number of agents per timesteps as well as the number of agents by type. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_agent_statistics.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_agent_statistics.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 
 The output will be saved in the `./output/visualization/plot_agent_stats` directory.
 
@@ -132,16 +131,21 @@ The output will be saved in the `./output/visualization/plot_agent_stats` direct
 `plot_all_trajectories.py` plots the trajectories of the agents from the dataset onto the map. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_all_trajectories.py --base_dir [base_dir] --traj_version [traj_version] --to_process [to_process] --drop_interp --dpi [dpi]
+python amelia_datatools/visualization_tools/plot_all_trajectories.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --to_process <to_process> \
+    --drop_interp \
+    --dpi <dpi>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[to_process]` is the percentage of files to plot. By default it is set to `1.0`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<to_process>` is the percentage of files to plot. By default it is set to `1.0`.
 - `--drop_interp` is a flag to drop the interpolated points. By default it is set to `False`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
 
 The output will be saved in the `./output/visualization/plot_all_trajectories` directory.
 
@@ -150,33 +154,41 @@ The output will be saved in the `./output/visualization/plot_all_trajectories` d
 `plot_average_distance.py` plots the average distance between agents by timestamp. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_average_distance.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_average_distance.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 
 The output will be saved in the `./output/visualization/plot_average_distance` directory.
 
-
-#### Plot Crowdeness
+#### Plot Crowdedness
 
 `plot_crowdedness.py` plots the histogram of the airports crowdedness. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_crowdedness.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files] --process
+python amelia_datatools/visualization_tools/plot_crowdedness.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --dpi <dpi> \
+    --num_files <num_files> \
+    --process
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 - `--process` is a flag to process the data. By default it is set to `False`.
 
 The output will be saved in the `./output/visualization/plot_crowdedness` directory.
@@ -186,16 +198,21 @@ The output will be saved in the `./output/visualization/plot_crowdedness` direct
 `plot_interp_stats.py` plots the agents' statistics with the interpolated points. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_interp_stats.py --base_dir [base_dir] --traj_version [traj_version] --moving --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_interp_stats.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --moving \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
 - `--moving` is a flag to plot taking into account only the moving agents. By default it is set to `False`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 
 The output will be saved in the `./output/visualization/plot_interp_stats` directory.
 
@@ -204,19 +221,28 @@ The output will be saved in the `./output/visualization/plot_interp_stats` direc
 `plot_motion_profiles.py` plots the motion profiles of the agents, they might be `acceleration`, `speed` or `heading`. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_motion_profiles.py --base_dir [base_dir] --traj_version [traj_version] --to_process --input_path [input_path] --motion_profile [motion_profile] --drop_interp --agent_type [agent_type] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_motion_profiles.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --to_process \
+    --input_path <input_path> \
+    --motion_profile <motion_profile> \
+    --drop_interp \
+    --agent_type <agent_type> \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[to_process]` is the percentage of files to plot. By default it is set to `1.0`.
-- `[input_path]` is the path to the input file. By default it is set to `./output/cahe/compute_motion_profiles`.
-- `[motion_profile]` is the motion profile to plot. By default it is set to `acceleration`. The available options are `acceleration`, `speed` and `heading`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<to_process>` is the percentage of files to plot. By default it is set to `1.0`.
+- `<input_path>` is the path to the input file. By default it is set to `./output/cache/compute_motion_profiles`.
+- `<motion_profile>` is the motion profile to plot. By default it is set to `acceleration`. The available options are `acceleration`, `speed` and `heading`.
 - `--drop_interp` is a flag to drop the interpolated points. By default it is set to `False`.
-- `[agent_type]` is the type of agent to plot. By default it is set to `aircraft`. Other options are `aircraft`, `vehicle`, `unknown` and `all`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
+- `<agent_type>` is the type of agent to plot. By default it is set to `aircraft`. Other options are `aircraft`, `vehicle`, `unknown` and `all`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
 
 The output will be saved in the `./output/visualization/plot_motion_profiles` directory.
 
@@ -225,32 +251,40 @@ The output will be saved in the `./output/visualization/plot_motion_profiles` di
 `plot_moving_agent_stats.py` plots the moving agents versus the stationary agents. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_moving_agent_stats.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_moving_agent_stats.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 
 The output will be saved in the `./output/visualization/plot_moving_agent_stats` directory.
 
-#### Plot Sequence Lenghts
+#### Plot Sequence Lengths
 
 `plot_sequence_lengths.py` plots the sequence lengths of the agents. Run the following command:
 
 ```bash
-python amelia_datatools/visualization_tools/plot_sequence_lengths.py --base_dir [base_dir] --traj_version [traj_version] --dpi [dpi] --num_files [num_files]
+python amelia_datatools/visualization_tools/plot_sequence_lengths.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --dpi <dpi> \
+    --num_files <num_files>
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[dpi]` is the resolution of the image. By default it is `600`.
-- `[num_files]` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<dpi>` is the resolution of the image. By default it is `600`.
+- `<num_files>` is the number of files to plot. By default it is set to `-1`. Which plots all the files in the directory.
 
 ### Data Tools
 
@@ -259,45 +293,48 @@ Where:
 `get_peak_hour.py` gets the peak crowdedness of the airports by hour. Run the following command:
 
 ```bash
-python amelia_datatools/todo/get_peak_hour.py --base_dir [base_dir] --traj_version [traj_version] --output_dir [output_dir] --airport [airport] --parallel
+python amelia_datatools/todo/get_peak_hour.py \
+  --base_dir <base_dir> \
+  --traj_version <traj_version> \
+  --output_dir <output_dir> \
+  --airport <airport> \
+  --parallel
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[output_dir]` is the path to the output directory. By default it is `./output/crowdedness`.
-- `[airport]` is the airport to process. By default it is set to `all`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<output_dir>` is the path to the output directory. By default it is `./output/crowdedness`.
+- `<airport>` is the airport to process. By default it is set to `all`.
 - `--parallel` is a flag to process the data in parallel. By default it is set to `True`.
 
 The output will be saved in the `./output/crowdedness` directory.
-
 
 #### Get Movement Statistics
 
 `get_movement_stats.py` gets the movement statistics of the agents. Run the following command:
 
 ```bash
-python amelia_datatools/todo/get_movement_stats.py --base_dir [base_dir] --traj_version [traj_version] --output_dir [output_dir] --airport [airport] --parallel
+python amelia_datatools/todo/get_movement_stats.py \
+    --base_dir <base_dir> \
+    --traj_version <traj_version> \
+    --output_dir <output_dir> \
+    --airport <airport> \
+    --parallel
 ```
 
-Where:
+where:
 
-- `[base_dir]` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
-- `[traj_version]` is the version of the trajectory file. By default it is `a10v08`.
-- `[output_dir]` is the path to the output directory. By default it is `./output/movement`.
-- `[airport]` is the airport to process. By default it is set to `all`.
+- `<base_dir>` is the path to the directory where the data is stored. By default it is `./datasets/amelia`.
+- `<traj_version>` is the version of the trajectory file. By default it is `a10v08`.
+- `<output_dir>` is the path to the output directory. By default it is `./output/movement`.
+- `<airport>` is the airport to process. By default it is set to `all`.
 - `--parallel` is a flag to process the data in parallel. By default it is set to `True`.
 
 The output will be saved in the `./output/movement` directory.
 
-### Dataset Tools
-
 ## BibTeX
-
-Our paper:
-
-**Amelia: A Large Dataset and Model for Airport Surface Movement Forecasting [[paper](https://arxiv.org/pdf/2407.21185)]**
 
 If you find our work useful in your research, please cite us!
 

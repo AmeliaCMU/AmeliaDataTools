@@ -19,11 +19,11 @@ class dotdict(dict):
 
 
 class TrajectoryProcessor():
-    def __init__(self, base_dir: str, traj_version: str, output_dir: str, airport: str, parrallel: bool):
+    def __init__(self, base_dir: str, traj_version: str, output_dir: str, airport: str, parallel: bool):
         self.base_dir = base_dir
         self.out_dir = output_dir
         self.airport = airport
-        self.parrallel = parrallel
+        self.parallel = parallel
         self.trajectories_dir = os.path.join(
             self.base_dir, f'traj_data_{traj_version}/raw_trajectories', airport)
         print('---- Analyzing data in ', self.trajectories_dir, '----')
@@ -102,7 +102,7 @@ class TrajectoryProcessor():
         plt.savefig(f'{self.out_dir}/{metric}_{self.airport}.png', dpi=800)
         plt.close()
 
-    def process_file_parrallel(self):
+    def process_file_parallel(self):
         pool = multiprocessing.Pool(processes=20)
         result = pool.map(self.process_file, self.trajectories_files)
         pool.close()
@@ -122,8 +122,8 @@ class TrajectoryProcessor():
         self.get_histogram(max_acceleration, metric='max_acceleration', title='Max Acceleration')
 
     def get_statistics(self):
-        if (self.parrallel):
-            self.process_file_parrallel()
+        if (self.parallel):
+            self.process_file_parallel()
         else:
             self.process_file_sequential()
 
@@ -138,7 +138,7 @@ if __name__ == '__main__':
         '--traj_version', default='a10v08', type=str, help='Trajectory version.')
     parser.add_argument('--output_dir', default='./output/movement', type=str, help='Output path.')
     parser.add_argument('--airport', default='all', type=str, help='Airport to process.')
-    parser.add_argument('--parrallel', default=True, type=str, help='Enable parrallel computing')
+    parser.add_argument('--parallel', default=True, type=str, help='Enable parallel computing')
     args = parser.parse_args()
 
     if args.airport == 'all':
