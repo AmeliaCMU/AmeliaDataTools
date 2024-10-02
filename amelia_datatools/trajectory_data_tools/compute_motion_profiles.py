@@ -162,6 +162,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--airport', type=str, default='kbos')
     parser.add_argument('--traj_version', type=str, default=VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')
