@@ -6,8 +6,8 @@ import pandas as pd
 import pickle
 from tqdm import tqdm
 
-from amelia_datatools.utils.common import CACHE_DIR, STATS_DIR, TRAJ_DATA_DIR, AIRPORT_COLORMAP, AgentType
-from amelia_datatools.utils.utils import get_file_name
+from amelia_datatools.utils.common import CACHE_DIR, STATS_DIR, TRAJ_DATA_DIR, AIRPORT_COLORMAP, AgentType, VERSION, DATA_DIR, OUTPUT_DIR
+from amelia_datatools.utils.utils import get_file_name, get_airport_list
 
 
 def get_agent_counts(file_list: list) -> dict:
@@ -47,18 +47,23 @@ def compute_agent_count_stats(agent_counts: dict) -> dict:
     return agent_count_stats, agent_counts
 
 
-def agent_count():
+def agent_count(base_dir: str, airport: str, traj_version: str, output_dir: str):
 
     plt.rc('xtick', labelsize=16)
     plt.rc('ytick', labelsize=16)
 
-    cache_dir = os.path.join(CACHE_DIR, get_file_name(__file__))
+    cache_dir = os.path.join(output_dir, "cache", get_file_name(__file__))
     os.makedirs(cache_dir, exist_ok=True)
 
-    stats_dir = os.path.join(STATS_DIR, get_file_name(__file__))
+    stats_dir = os.path.join(output_dir, "statistics", get_file_name(__file__))
     os.makedirs(stats_dir, exist_ok=True)
 
-    airport_list = AIRPORT_COLORMAP.keys()
+    if airport == "all":
+        airport_list = get_airport_list()
+    else:
+        airport_list = [airport]
+
+    # airport_list = AIRPORT_COLORMAP.keys()
     name = {'total': 'Total', '0': 'Aircraft', '1': 'Vehicle', '2': 'Unknown'}
 
     for airport in airport_list:
@@ -67,11 +72,15 @@ def agent_count():
         stats_file = os.path.join(stats_dir, f"{airport}_stats.json")
         cache_file = os.path.join(cache_dir, f"{airport}.pkl")
 
-        traj_dir = os.path.join(TRAJ_DATA_DIR, "raw_trajectories", airport)
+        traj_dir = os.path.join(f"{base_dir}", f"traj_data_{traj_version}", "raw_trajectories", airport)
         traj_files = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir)]
 
         agent_counts = get_agent_counts(traj_files)
         agent_counts_stats, agent_counts = compute_agent_count_stats(agent_counts)
+
+        # check if there is a color map for the airport
+        if airport not in AIRPORT_COLORMAP.keys():
+            AIRPORT_COLORMAP[airport] = "black"
 
         with open(stats_file, 'w') as f:
             json.dump(agent_counts_stats, f, indent=2)
@@ -119,4 +128,12 @@ def agent_count():
 
 
 if __name__ == "__main__":
-    agent_count()
+    import argparse
+    airports = get_airport_list()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--airport', default="all", choices=["all"] + airports, type=str)
+    parser.add_argument("--base_dir", type=str, default=f"{DATA_DIR}")
+    parser.add_argument("--traj_version", type=str, default=VERSION)
+    parser.add_argument("--output_dir", type=str, default=OUTPUT_DIR)
+    args = parser.parse_args()
+    agent_count(**vars(args))
