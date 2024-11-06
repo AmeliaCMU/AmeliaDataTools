@@ -19,10 +19,12 @@ def debug_interpolation(base_dir: str, airport: str, output_dir: str, traj_versi
     else:
         airports = [airport]
     for airport in airports:
+        cvs_dir = os.path.join(base_dir, f'traj_data_{traj_version}/raw_trajectories', airport)
+        if not os.path.exists(cvs_dir):
+            print(f"Directory {cvs_dir} does not exist.")
+            continue
         output_dir = os.path.join(output_dir, get_file_name(__file__), airport)
         os.makedirs(output_dir, exist_ok=True)
-
-        cvs_dir = os.path.join(base_dir, f'traj_data_{traj_version}/raw_trajectories', airport)
 
         csv_files = [os.path.join(cvs_dir, f) for f in os.listdir(cvs_dir)]
 
