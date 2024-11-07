@@ -130,12 +130,15 @@ class TrajectoryProcessor():
         return acc_profile, speed_profile, heading_profile
 
 
-def run_processor(base_path, traj_version, to_process, drop_interp, agent_type, dpi):
+def run_processor(base_dir, airport, traj_version, to_process, drop_interp, agent_type, dpi):
     out_dir = os.path.join(CACHE_DIR, __file__.split('/')[-1].split(".")[0])
     os.makedirs(out_dir, exist_ok=True)
     acc_profile, speed_profile, heading_profile = {}, {}, {}
-    for airport in AIRPORT_COLORMAP.keys():
-        processor = TrajectoryProcessor(airport, base_path, traj_version,
+    airports = AIRPORT_COLORMAP.keys()
+    if airport != 'all':
+        airports = [airport]
+    for airport in airports:
+        processor = TrajectoryProcessor(airport, base_dir, traj_version,
                                         to_process, drop_interp, agent_type, dpi)
         acc, speed, heading = processor.compute_motion_profiles()
         acc_profile[airport] = acc
@@ -162,7 +165,7 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
     parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--airport', type=str, default='kbos')
+    parser.add_argument('--airport', type=str, default='all', choices=AIRPORT_COLORMAP.keys())
     parser.add_argument('--traj_version', type=str, default=VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')

@@ -11,7 +11,7 @@ from tqdm import tqdm
 import glob
 
 from amelia_datatools.utils import common as C
-from amelia_datatools.utils import utils
+import amelia_datatools.utils.utils as U
 from amelia_datatools.utils.processor_utils import transform_extent
 
 
@@ -20,7 +20,7 @@ class TrajectoryProcessor():
             self, airport: str, base_dir: str, traj_version: str, to_process: float, dpi: int, drop_interp: bool, output_dir: str):
         self.base_dir = base_dir
 
-        self.out_dir = os.path.join(output_dir, utils.get_file_name(__file__))
+        self.out_dir = os.path.join(output_dir, U.get_file_name(__file__))
 
         self.airport = airport
         self.dpi = dpi
@@ -137,8 +137,11 @@ class TrajectoryProcessor():
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    airports = U.get_airport_list()
     parser = ArgumentParser()
     parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input path')
+    parser.add_argument('--airport', type=str, default='all', help='Airport to process',
+                        choices=['all'] + airports)
     parser.add_argument('--traj_version', type=str, default=C.VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')
@@ -146,9 +149,12 @@ if __name__ == '__main__':
     parser.add_argument('--output_dir', type=str, default=C.VIS_DIR)
     args = parser.parse_args()
 
-    airport_list = utils.get_airport_list()
+    if args.airport != 'all':
+        airports = [args.airport]
 
-    for airport in tqdm(airport_list):
+    for airport in airports:
+        kargs = vars(args)
+        kargs['airport'] = airport
         args.airport = airport
-        processor = TrajectoryProcessor(**vars(args))
+        processor = TrajectoryProcessor(**kargs)
         processor.plot_trajectories()

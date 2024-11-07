@@ -8,7 +8,8 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import multiprocessing
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP
+import amelia_datatools.utils.common as C
+import amelia_datatools.utils.utils as U
 
 
 class dotdict(dict):
@@ -21,7 +22,7 @@ class dotdict(dict):
 class TrajectoryProcessor():
     def __init__(self, base_dir: str, traj_version: str, output_dir: str, airport: str, parallel: bool):
         self.base_dir = base_dir
-        self.out_dir = output_dir
+        self.out_dir = f"{output_dir}/movement"
         self.airport = airport
         self.parallel = parallel
         self.trajectories_dir = os.path.join(
@@ -130,23 +131,23 @@ class TrajectoryProcessor():
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    airports = U.get_airport_list()
     parser = ArgumentParser()
-
     parser.add_argument(
-        '--base_dir', default='./datasets/amelia', type=str, help='Input path.')
+        '--base_dir', default=C.DATA_DIR, type=str, help='Input path.')
     parser.add_argument(
-        '--traj_version', default='a10v08', type=str, help='Trajectory version.')
-    parser.add_argument('--output_dir', default='./output/movement', type=str, help='Output path.')
-    parser.add_argument('--airport', default='all', type=str, help='Airport to process.')
-    parser.add_argument('--parallel', default=True, type=str, help='Enable parallel computing')
+        '--traj_version', default=C.VERSION, type=str, help='Trajectory version.')
+    parser.add_argument('--output_dir', default=C.OUTPUT_DIR, type=str, help='Output path.')
+    parser.add_argument('--airport', default='all', type=str,
+                        help='Airport to process.', choices=["all"] + airports)
+    parser.add_argument('--parallel', default=True, type="store_true", help='Enable parallel computing')
     args = parser.parse_args()
 
     if args.airport == 'all':
-        for airport in AIRPORT_COLORMAP.keys():
+        for airport in airports:
             args.airport = airport
             processor = TrajectoryProcessor(**vars(args))
             processor.get_statistics()
     else:
-
         processor = TrajectoryProcessor(**vars(args))
         processor.get_statistics()

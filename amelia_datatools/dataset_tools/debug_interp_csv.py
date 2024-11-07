@@ -1,5 +1,5 @@
-from amelia_datatools.utils.utils import get_file_name, get_airport_list
-from amelia_datatools.utils.common import VERSION, DATA_DIR, OUTPUT_DIR, AIRPORTS
+import amelia_datatools.utils.utils as U
+import amelia_datatools.utils.common as C
 from itertools import groupby
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +23,7 @@ def debug_interpolation(base_dir: str, airport: str, output_dir: str, traj_versi
         if not os.path.exists(cvs_dir):
             print(f"Directory {cvs_dir} does not exist.")
             continue
-        output_dir = os.path.join(output_dir, get_file_name(__file__), airport)
+        output_dir = os.path.join(output_dir, U.get_file_name(__file__), airport)
         os.makedirs(output_dir, exist_ok=True)
 
         csv_files = [os.path.join(cvs_dir, f) for f in os.listdir(cvs_dir)]
@@ -82,12 +82,12 @@ def debug_interpolation(base_dir: str, airport: str, output_dir: str, traj_versi
 
 if __name__ == "__main__":
     import argparse
-    airports = get_airport_list()
+    airports = U.get_airport_list()
     parser = argparse.ArgumentParser()
     parser.add_argument('--airport', default="all", choices=["all"] + airports)
-    parser.add_argument("--base_dir", type=str, default=f"{DATA_DIR}")
-    parser.add_argument('--traj_version', default=VERSION)
-    parser.add_argument("--output_dir", type=str, default=f"{OUTPUT_DIR}")
+    parser.add_argument("--base_dir", type=str, default=f"{C.DATA_DIR}")
+    parser.add_argument('--traj_version', default=C.VERSION)
+    parser.add_argument("--output_dir", type=str, default=f"{C.OUTPUT_DIR}")
     args = parser.parse_args()
 
     debug_interpolation(**vars(args))

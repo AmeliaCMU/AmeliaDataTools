@@ -198,6 +198,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.moving:
-        plot_moving(args.base_dir, args.traj_version, args.dpi, args.num_files)
+        plot_moving(args.base_dir, args.traj_version, args.dpi, args.num_files, args.output_dir)
     else:
         plot(args.base_dir, args.traj_version, args.dpi, args.num_files, args.output_dir)

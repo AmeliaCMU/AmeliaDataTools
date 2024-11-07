@@ -6,13 +6,14 @@ from tqdm import tqdm
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 
-from amelia_datatools.utils.common import AIRPORT_COLORMAP
+import amelia_datatools.utils.common as C
+import amelia_datatools.utils.utils as U
 from amelia_datatools.utils.processor_utils import get_time_from_file
 
 
 class DatasetProcessor():
     def __init__(self, base_dir: str, traj_version: str, output_dir: str, airport: str, parallel: bool, seq_len: int = 60, skip: int = 1, dim: int = 11):
-        self.out_dir = output_dir
+        self.out_dir = f"{output_dir}/crowdedness"
         self.airport = airport
         self.parallel = parallel
         # Load Trajectories
@@ -45,6 +46,7 @@ class DatasetProcessor():
         utc_time = get_time_from_file(file, airport_id)
         # Get the number of unique frames
         frames = data.Frame.unique()
+
         for frame in frames:
             unique_IDs = data[:][data.Frame == frame].shape[0]
             agents_in_scenario.append(unique_IDs)
@@ -91,8 +93,11 @@ class DatasetProcessor():
         gmt_times = list(dictionary_count.keys())
         frequency = dictionary_count.values()
         # Plot the bar chart
+        if self.airport not in C.AIRPORT_COLORMAP.keys():
+            C.AIRPORT_COLORMAP[self.airport] = "black"
+
         plt.bar(gmt_times, frequency, align='center',
-                alpha=0.7, color=AIRPORT_COLORMAP[self.airport])
+                alpha=0.7, color=C.AIRPORT_COLORMAP[self.airport])
         plt.xlabel('Hour (Local Time)')
         plt.ylabel('Agent Count')
         plt.title(f'Agent Count per Hour Across Dataset (Local Time) {self.airport}')
@@ -103,16 +108,27 @@ class DatasetProcessor():
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    airports = U.get_airport_list()
     parser = ArgumentParser()
     parser.add_argument(
-        '--base_dir', default='./datasets/amelia', type=str, help='Input path.')
-    parser.add_argument('--traj_version', default='a10v08', type=str, help='Trajectory version.')
-    parser.add_argument('--output_dir', default='./output/crowdedness',
-                        type=str, help='Output path.')
-    parser.add_argument('--airport', default='kjfk', type=str, help='Airport to process.')
-    parser.add_argument('--parallel', action="store_true",
-                        default=True, help='Enable parallel computing')
+        '--base_dir', default=C.DATA_DIR, type=str, help='Input path.')
+    parser.add_argument(
+        '--traj_version', default=C.VERSION, type=str, help='Trajectory version.')
+    parser.add_argument(
+        '--output_dir', default=C.OUTPUT_DIR, type=str, help='Output path.')
+    parser.add_argument(
+        '--airport', default='all', type=str, help='Airport to process.', choices=["all"] + airports)
+    parser.add_argument(
+        '--parallel', action="store_true", default=True, help='Enable parallel computing')
     args = parser.parse_args()
 
-    processor = DatasetProcessor(**vars(args))
-    processor.process_dataset()
+    if args.airport == 'all':
+        for airport in airports:
+            print(f"Processing airport: {airport}")
+            kargs = vars(args)
+            kargs['airport'] = airport
+            processor = DatasetProcessor(**kargs)
+            processor.process_dataset()
+    else:
+        processor = DatasetProcessor(**vars(args))
+        processor.process_dataset()

@@ -48,7 +48,11 @@ AIRPORT_COLORMAP = {
     "kmdw": "dodgerblue",
     "kmsy": "mediumorchid",
     "ksea": "violet",
-    "ksfo": "deeppink"
+    "ksfo": "deeppink",
+    "katl": "darkorange",
+    "kbfi": "darkred",
+    "kpit": "darkgreen",
+    "ksan": "darkblue",
 }
 
 #
