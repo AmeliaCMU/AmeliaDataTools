@@ -35,7 +35,11 @@ TIME_ZONES = {
     "kmdw": 'America/Chicago',
     "kmsy": 'US/Central',
     "ksea": 'US/Pacific',
-    "ksfo": 'America/Los_Angeles'
+    "ksfo": 'America/Los_Angeles',
+    "kpit": 'America/New_York',
+    "katl": 'America/New_York',
+    "kbfi": 'America/Los_Angeles',
+    "ksan": 'America/Los_Angeles'
 }
 
 
@@ -108,8 +112,10 @@ def get_time_from_file(filename, airport_id):
     time_zone = pytz.timezone(TIME_ZONES[airport_id])
     timestamp_str = os.path.splitext(filename)[0].split('_')[-1]
     timestamp = int(timestamp_str)
+
     utc_datetime = datetime.datetime.fromtimestamp(timestamp, tz=timezone.utc)
-    local_time = pytz.utc.localize(utc_datetime, is_dst=None).astimezone(time_zone)
+    # local_time = pytz.utc.localize(utc_datetime, is_dst=None).astimezone(time_zone)
+    local_time = utc_datetime.astimezone(time_zone)
     return local_time.hour
 
 
