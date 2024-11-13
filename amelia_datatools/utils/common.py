@@ -53,6 +53,10 @@ AIRPORT_COLORMAP = {
     "kbfi": "darkred",
     "kpit": "darkgreen",
     "ksan": "darkblue",
+    "kdfw": "darkviolet",
+    "kcle": "darkcyan",
+    "kmke": "darkgoldenrod"
+
 }
 
 #

@@ -18,15 +18,16 @@ def save(filetag, dpi=400):
 
 
 def plot_scene(scenario, assets, filetag, order_list=None):
-    raster_map, hold_lines, graph_map, ll_extent, agents = assets
-    north, east, south, west, _, _ = ll_extent
+    bkg, hold_lines, graph_nx, limits, agents = assets
+    limits, ref_data = limits
+    north, east, south, west, z_min, z_max = limits
     # Save states
     fig, movement_plot = plt.subplots()
     # Display global map
     movement_plot.imshow(
-        raster_map, zorder=0, extent=[west, east, south, north], alpha=0.8, cmap='gray_r')
+        bkg, zorder=0, extent=[west, east, south, north], alpha=0.8, cmap='gray_r')
 
-    sequences = scenario['sequences']
+    sequences = scenario['agent_sequences']
     agent_types = scenario['agent_types']
 
     N, T, D = sequences.shape
@@ -60,10 +61,10 @@ def plot_scene(scenario, assets, filetag, order_list=None):
     save(filetag)
 
 
-def get_scene_list(airpoirt, base_dir, version):
+def get_scene_list(airport, base_dir, version):
     scene_list = []
 
-    traj_dir = os.path.join(base_dir, f'traj_data_{version}/proc_trajectories', f'{airpoirt}')
+    traj_dir = os.path.join(base_dir, f'traj_data_{version}/proc_full_scenes', f'{airport}')
     trajdirs = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir)]
     for trajdir in trajdirs:
         scenarios = glob.glob(f"{trajdir}/*.pkl", recursive=True)

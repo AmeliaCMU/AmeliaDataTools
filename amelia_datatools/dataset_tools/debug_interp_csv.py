@@ -15,7 +15,7 @@ def debug_interpolation(base_dir: str, airport: str, output_dir: str, traj_versi
 
     INT = '[INT]'
     if airport == "all":
-        airports = get_airport_list()
+        airports = U.get_airport_list()
     else:
         airports = [airport]
     for airport in airports:
