@@ -19,7 +19,7 @@ ASSET_DATA_DIR = os.path.join(f"{DATA_DIR}", "assets")
 GRAPH_DATA_DIR = os.path.join(f"{DATA_DIR}", "graph_data")
 
 # Global variables
-DPI = 600
+DPI = 300
 
 AIRCRAFT = 0
 VEHICLE = 1

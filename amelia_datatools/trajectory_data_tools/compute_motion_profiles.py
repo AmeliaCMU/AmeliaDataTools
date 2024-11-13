@@ -6,6 +6,7 @@ import pandas as pd
 import random
 
 from amelia_datatools.utils.common import DPI, VERSION, CACHE_DIR, KNOTS_2_MS, AIRPORT_COLORMAP, DATA_DIR
+import amelia_datatools.utils.utils as U
 
 
 class TrajectoryProcessor():
@@ -134,38 +135,41 @@ def run_processor(base_dir, airport, traj_version, to_process, drop_interp, agen
     out_dir = os.path.join(CACHE_DIR, __file__.split('/')[-1].split(".")[0])
     os.makedirs(out_dir, exist_ok=True)
     acc_profile, speed_profile, heading_profile = {}, {}, {}
-    airports = AIRPORT_COLORMAP.keys()
+
     if airport != 'all':
         airports = [airport]
+    else:
+        airports = U.get_airport_list()
     for airport in airports:
         processor = TrajectoryProcessor(airport, base_dir, traj_version,
                                         to_process, drop_interp, agent_type, dpi)
         acc, speed, heading = processor.compute_motion_profiles()
-        acc_profile[airport] = acc
-        speed_profile[airport] = speed
-        heading_profile[airport] = heading
+        # acc_profile[airport] = acc
+        # speed_profile[airport] = speed
+        # heading_profile[airport] = heading
 
-    suffix = '_dropped_int' if drop_interp else ''
-    suffix += f'_{agent_type}'
-    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles',
-                            f'acceleration_profiles{suffix}.pkl')
-    with open(out_file, 'wb') as f:
-        pickle.dump(acc_profile, f)
+        suffix = '_dropped_int' if drop_interp else ''
+        suffix += f'_{agent_type}'
+        out_file = os.path.join(
+            CACHE_DIR, 'compute_motion_profiles', f'acceleration_profiles{suffix}_{airport}.pkl')
+        with open(out_file, 'wb') as f:
+            pickle.dump(acc, f)
 
-    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'speed_profiles{suffix}.pkl')
-    with open(out_file, 'wb') as f:
-        pickle.dump(speed_profile, f)
+        out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'speed_profiles{suffix}_{airport}.pkl')
+        with open(out_file, 'wb') as f:
+            pickle.dump(speed, f)
 
-    out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'heading_profiles{suffix}.pkl')
-    with open(out_file, 'wb') as f:
-        pickle.dump(heading_profile, f)
+        out_file = os.path.join(CACHE_DIR, 'compute_motion_profiles', f'heading_profiles{suffix}_{airport}.pkl')
+        with open(out_file, 'wb') as f:
+            pickle.dump(heading, f)
 
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
+    airports = U.get_airport_list()
     parser = ArgumentParser()
     parser.add_argument('--base_dir', default=DATA_DIR, type=str, help='Input path')
-    parser.add_argument('--airport', type=str, default='all', choices=AIRPORT_COLORMAP.keys())
+    parser.add_argument('--airport', type=str, default='all', choices=['all'] + airports)
     parser.add_argument('--traj_version', type=str, default=VERSION)
     parser.add_argument('--to_process', default=1.0, type=float)
     parser.add_argument('--drop_interp', action='store_true')

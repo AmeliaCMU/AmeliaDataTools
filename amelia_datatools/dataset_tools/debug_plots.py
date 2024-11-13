@@ -7,7 +7,7 @@ import pickle
 import random
 
 from amelia_datatools.utils import common as C
-from amelia_datatools.utils.utils import get_file_name
+from amelia_datatools.utils.utils import get_file_name, get_airport_list
 from amelia_scenes.splitting.dataset import load_assets
 from amelia_scenes.visualization.common import plot_agent
 
@@ -67,8 +67,9 @@ def plot_scene(scenario, assets, filetag, order_list=None, version='v5'):
 
 if __name__ == "__main__":
     import argparse
+    airports = get_airport_list()
     parser = argparse.ArgumentParser()
-    parser.add_argument('--airport', default="kbos", choices=["ksea", "kewr"])
+    parser.add_argument('--airport', default="katl", choices=["all"] + airports)
     parser.add_argument("--base_dir", type=str,
                         default=f"{C.DATA_DIR}")
     parser.add_argument("--traj_version", type=str, default=C.VERSION)
