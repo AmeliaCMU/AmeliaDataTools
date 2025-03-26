@@ -9,8 +9,8 @@ from tqdm import tqdm
 from geopy.geocoders import Nominatim
 
 
-from amelia_maps.utils import common as C
-from amelia_maps.utils import utils as U
+from amelia_datatools.utils import common as C
+from amelia_datatools.utils import utils as U
 
 
 class RunningStats:
@@ -54,7 +54,7 @@ def fetch_location_coordinates(location):
     return response, bbox
 
 
-def run_limits(base_dir: str, airport: str, traj_version: str, output: str):
+def run_limits(base_dir: str, airport: str, traj_version: str):
 
     black_list = ['Frame', 'ID', 'Type', 'Interp']
 
@@ -72,9 +72,9 @@ def run_limits(base_dir: str, airport: str, traj_version: str, output: str):
         ll_limits = (float(north), float(east), float(south), float(west))
         airport_name = components = [comp.strip() for comp in response[0].split(',')][0]
         latlng = response[1]
-        U.create_limits(ll_limits, (airport, airport_name), latlng, output)
+        U.create_limits(ll_limits, (airport, airport_name), latlng, assets_dir)
 
-        limits_file = os.path.join(output, 'limits.json')
+        # limits_file = os.path.join(output, 'limits.json')
 
     print(f"\tFound limits file: {limits_file}")
     with open(limits_file, 'r') as f:
@@ -121,9 +121,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--base_dir', default=C.DATA_DIR, type=str, help='Input directory')
-    parser.add_argument('--airport', default='ksea', type=str, help='ICAO Airport Code')
+    parser.add_argument('--airport', default='katl', type=str, help='ICAO Airport Code')
     parser.add_argument('--traj_version', default=C.VERSION, type=str, help='Input directory')
-    parser.add_argument('--output', default=C.OUTPUT_DIR, type=str, help='Output directory')
     args = parser.parse_args()
     airports = U.get_airport_list(args.traj_version)
     if args.airport != "all" and args.airport not in airports:
@@ -139,7 +138,4 @@ if __name__ == "__main__":
     for airport in tqdm(airports):
         print(f"Running: {airport}")
         kargs['airport'] = airport
-        output = os.path.join(kargs['output'], airport)
-        os.makedirs(output, exist_ok=True)
-        kargs['output'] = output
         run_limits(**kargs)
