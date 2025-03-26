@@ -147,6 +147,10 @@ def get_airport_list(traj_version: str = C.VERSION) -> list:
     files = glob.glob(f"{assets_dir}/*")
     airport_list = []
     for file in files:
-        if os.path.isdir(file) and file != "blacklist":
-            airport_list.append(os.path.basename(file))
+
+        if os.path.isdir(file) and "blacklist" not in file:
+            airport = os.path.basename(file)
+            if "_" in airport:
+                continue
+            airport_list.append(airport)
     return airport_list
