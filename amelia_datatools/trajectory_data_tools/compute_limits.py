@@ -114,7 +114,6 @@ def run_limits(base_dir: str, airport: str, traj_version: str):
     ref_data['limits'] = limits
     with open(limits_file, 'w') as f:
         json.dump(ref_data, f)
-    print(f"\tAdding limits to reference file in: {limits_file}")
 
 
 if __name__ == "__main__":
