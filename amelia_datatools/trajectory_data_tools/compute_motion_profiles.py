@@ -25,7 +25,8 @@ class TrajectoryProcessor():
             self.base_dir, f'traj_data_{traj_version}', 'raw_trajectories', self.airport)
         print(f"Analyzing data in: {trajectories_dir}")
         self.trajectory_files = [os.path.join(trajectories_dir, f)
-                                 for f in os.listdir(trajectories_dir)]
+                     for f in os.listdir(trajectories_dir)
+                     if f.endswith('.csv')]
         random.shuffle(self.trajectory_files)
         self.trajectory_files = self.trajectory_files[:int(len(self.trajectory_files) * to_process)]
 

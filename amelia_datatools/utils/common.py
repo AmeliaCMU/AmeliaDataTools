@@ -13,7 +13,7 @@ STATS_DIR = os.path.join(f"{OUTPUT_DIR}", "statistics")
 CACHE_DIR = os.path.join(f"{OUTPUT_DIR}", "cache")
 
 DATA_DIR = os.path.join(ROOT_DIR, "datasets/amelia")
-VERSION = "a10v08"
+VERSION = "a42v01"
 TRAJ_DATA_DIR = os.path.join(f"{DATA_DIR}", f"traj_data_{VERSION}")
 ASSET_DATA_DIR = os.path.join(f"{DATA_DIR}", "assets")
 GRAPH_DATA_DIR = os.path.join(f"{DATA_DIR}", "graph_data")
@@ -39,24 +39,54 @@ class AgentType(Enum):
 
 
 AIRPORT_COLORMAP = {
-    "panc": "crimson",
-    "kbos": "lightcoral",
-    "kdca": "orangered",
-    "kewr": "#2E8B57",
-    "kjfk": "limegreen",
-    "klax": "darkturquoise",
-    "kmdw": "dodgerblue",
-    "kmsy": "mediumorchid",
-    "ksea": "violet",
-    "ksfo": "deeppink",
-    "katl": "darkorange",
-    "kbfi": "darkred",
-    "kpit": "darkgreen",
-    "ksan": "darkblue",
-    "kdfw": "darkviolet",
-    "kcle": "darkcyan",
-    "kmke": "darkgoldenrod"
-
+    'panc': 'crimson',
+    'kbos': 'lightcoral',
+    'kdca': 'orangered',
+    'kewr': '#2E8B57',
+    'kjfk': 'limegreen',
+    'klax': 'darkturquoise',
+    'kmdw': 'dodgerblue',
+    'kmsy': 'mediumorchid',
+    'ksea': 'violet',
+    'ksfo': 'deeppink',
+    'katl': 'darkorange',
+    'kbfi': 'darkred',
+    'kpit': 'darkgreen',
+    'ksan': 'darkblue',
+    'kdfw': 'darkviolet',
+    'kcle': 'darkcyan',
+    'kmke': 'darkgoldenrod',
+    'kbdl': '#ffffb3',
+    'kbwi': '#bebada',
+    'kclt': '#fb8072',
+    'kcvg': '#80b1d3',
+    'kden': '#fdb462',
+    'kdtw': '#b3de69',
+    'kfll': '#fccde5',
+    'khou': '#d9d9d9',
+    'khwd': '#bc80bd',
+    'kiad': '#ccebc5',
+    'kiah': '#ffed6f',
+    'klas': '#8dd3c7',
+    'klga': '#ffff33',
+    'kmci': '#a6d854',
+    'kmco': '#fb8072',
+    'kmem': '#80b1d3',
+    'kmia': '#fdb462',
+    'kmsp': '#b3de69',
+    'koak': '#fccde5',
+    'kord': '#d9d9d9',
+    'korl': '#bc80bd',
+    'kpdx': '#ccebc5',
+    'kphl': '#ffed6f',
+    'kphx': '#ff7f00',
+    'kpvd': '#cab2d6',
+    'kpwk': '#6a3d9a',
+    'ksdf': '#b15928',
+    'kslc': '#1f78b4',
+    'ksna': '#33a02c',
+    'kstl': '#e31a1c',
+    'phnl': '#fdbf6f'
 }
 
 #

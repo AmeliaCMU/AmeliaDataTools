@@ -74,7 +74,7 @@ def compute_lenghts():
         cache_file = os.path.join(cache_dir, f"{airport}.pkl")
 
         traj_dir = os.path.join(TRAJ_DATA_DIR, "raw_trajectories", airport)
-        traj_files = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir)]
+        traj_files = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir) if f.endswith('.csv')]
 
         sequence_counts = get_sequence_counts(traj_files)
         sequence_counts_stats, sequence_counts = compute_sequence_count_stats(sequence_counts)

@@ -73,7 +73,7 @@ def agent_count(base_dir: str, airport: str, traj_version: str, output_dir: str)
         cache_file = os.path.join(cache_dir, f"{airport}.pkl")
 
         traj_dir = os.path.join(f"{base_dir}", f"traj_data_{traj_version}", "raw_trajectories", airport)
-        traj_files = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir)]
+        traj_files = [os.path.join(traj_dir, f) for f in os.listdir(traj_dir) if f.endswith('.csv')]
 
         agent_counts = get_agent_counts(traj_files)
         agent_counts_stats, agent_counts = compute_agent_count_stats(agent_counts)

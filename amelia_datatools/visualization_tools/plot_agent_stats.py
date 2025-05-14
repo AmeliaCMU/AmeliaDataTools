@@ -2,10 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
+import pickle
 from tqdm import tqdm
 
 from amelia_datatools.utils import common as C
+from amelia_datatools.utils import utils as U
 from amelia_datatools.utils import utils
+from plotnine import (
+    ggplot, aes, geom_col, scale_fill_manual,
+    labs, theme_minimal, theme, element_text, geom_text, theme_bw
+)
 
 
 def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir: str):
@@ -15,8 +21,8 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir
     print(f"Created output directory in: {output_dir}")
 
     plt.rcParams['font.size'] = 6
-
-    num_airports = len(C.AIRPORT_COLORMAP.keys())
+    airports = U.get_airport_list()
+    num_airports = len(airports)
 
     agent_counts = {}
     agent_types = {
@@ -24,12 +30,12 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir
         'Vehicle': [0 for _ in range(num_airports)],
         'Unknown': [0 for _ in range(num_airports)],
     }
-    for i, airport in enumerate(C.AIRPORT_COLORMAP.keys()):
+    for i, airport in enumerate(tqdm(airports, desc="Airports")):
         airport_up = airport.upper()
         print(f"Running airport: {airport_up}")
         agent_counts[airport_up] = []
         airport_dir = os.path.join(input_dir, airport)
-        traj_files = [os.path.join(airport_dir, f) for f in os.listdir(airport_dir)]
+        traj_files = [os.path.join(airport_dir, f) for f in os.listdir(airport_dir) if f.endswith('.csv')]
 
         if num_files == -1:
             num_files = len(traj_files)
@@ -53,31 +59,70 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir
                     agent_types['Vehicle'][i] += 1
                 else:
                     agent_types['Unknown'][i] += 1
+    
+    # Save agent_counts as cache
+    cache_path = os.path.join(output_dir, "_cache")
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    
+    with open(os.path.join(cache_path, "agent_counts.pkl"), "wb") as f:
+        pickle.dump(agent_counts, f)
+    print(f"Agent counts cached at: {cache_path}")
+
+    with open(os.path.join(cache_path, "agent_types.pkl"), "wb") as f:
+        pickle.dump(agent_types, f)
+    print(f"Agent types cached at: {cache_path}")
 
     # Plot unique agents
-    fig, ax = plt.subplots()
-    fontcolor = 'dimgray'
-    airports = agent_counts.keys()
-    counts = [np.asarray(c).sum() for c in agent_counts.values()]
-    bar_labels = agent_counts.values()
-    bar_colors = C.AIRPORT_COLORMAP.values()
-
-    ax.bar(airports, counts, color=bar_colors)
-    ax.set_ylabel('Num. of Agents', color=fontcolor, fontsize=10)
-    ax.set_title('Total Num. of Unique Agents', color=fontcolor, fontsize=15)
-    ax.tick_params(color=fontcolor, labelcolor=fontcolor)
-    for spine in ax.spines.values():
-        spine.set_edgecolor(fontcolor)
-
-    # ax.legend()
-    plt.savefig(f"{output_dir}/unique_agents.png", dpi=dpi, bbox_inches='tight')
-    plt.close()
-
+    total_agents = sum([np.asarray(c).sum() for c in agent_counts.values()])
+    df = pd.DataFrame({
+        "airport": list(agent_counts.keys()),
+        "count":   [np.asarray(c).sum() for c in agent_counts.values()]
+    })
+    df["percentage"] = df["count"] / total_agents * 100
+    airport_colors = {k: C.AIRPORT_COLORMAP[k.lower()] for k in df.airport}
+    # --------- construct the plot ----------
+    # Sort df and set airport as a categorical with the sorted order to ensure plotnine respects the order
+    df = df.sort_values("count", ascending=False)
+    df["airport"] = pd.Categorical(df["airport"], categories=df["airport"], ordered=True)
+    
+    g = (
+        ggplot(df, aes(x="airport", y="count", fill="airport"))
+        + geom_col(show_legend=False)
+        + scale_fill_manual(values=airport_colors)
+        + labs(
+            x="Airport (ICAO)",
+            y="# of Unique Agents",
+            title="Unique Agents Per Airport"
+        )
+        + theme_bw()
+        + theme(
+            axis_text_x=element_text(rotation=45, color="dimgray", size=6),
+            axis_text_y=element_text(color="dimgray",size=6),
+            axis_title  =element_text(color="dimgray"),
+            plot_title  =element_text(color="dimgray"),
+            panel_grid_major_x=element_text(alpha=0),  # disables vertical grid lines
+            panel_grid_minor_x=element_text(alpha=0),   # disables minor vertical grid lines
+            # panel_grid_major_y=element_text(alpha=0),  # disables horizontal grid lines
+        )
+        + geom_col(show_legend=False)
+        + geom_text(
+            aes(label="count"),
+            va='bottom',
+            format_string='{:.0f}',
+            size=3.5,
+            color='dimgray'
+        )
+    )
+    g.save(
+        os.path.join(output_dir, "unique_agents.png"), height=3, width=7, dpi=dpi 
+    )
+    
+    
     # Plot agent type
     fig, ax = plt.subplots()
     fontcolor = 'dimgray'
     airports = agent_counts.keys()
-    bar_colors = C.AIRPORT_COLORMAP.values()
+    bar_colors = [C.AIRPORT_COLORMAP[airport.lower()] for airport in airports]
 
     # the label locations
     x = np.arange(len(airports))
@@ -88,12 +133,11 @@ def plot(base_dir: str, traj_version: str, dpi: int, num_files: int,  output_dir
     fig, ax = plt.subplots(layout='constrained')
 
     color = {'Aircraft': 'darkblue', 'Vehicle': 'darkred', 'Unknown': 'darkgreen'}
-    for attribute, measurement in agent_types.items():
+    for multiplier, (attribute, measurement) in enumerate(agent_types.items()):
         offset = width * multiplier
         rects = ax.bar(
-            x + offset, measurement, width, label=attribute, alpha=0.6, color=color[attribute])
-        ax.bar_label(rects, padding=3, fontsize=5, color=fontcolor)
-        multiplier += 1
+            x + offset, measurement, width, label=attribute, alpha=0.6, color=color[attribute], align='center')
+        ax.bar_label(rects, padding=6, fontsize=5, color=fontcolor, label_type='edge')
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_xticks(x + width, airports)
