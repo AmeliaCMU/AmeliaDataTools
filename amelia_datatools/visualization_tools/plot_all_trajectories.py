@@ -257,7 +257,7 @@ class TrajectoryProcessor():
         north, east, south, west = self.limits_espg_4326
         projector = Transformer.from_crs(self.origin_crs, self.target_crs)
         fig, map_plot = plt.subplots(1)
-        map_plot.imshow(self.semantic_map, zorder=0, extent=[west, east, south, north], alpha=1.0)
+        map_plot.imshow(self.semantic_map, zorder=0, extent=[west, east, south, north], alpha=.5)
 
         perc_points = []
         high_interp_files = []
@@ -306,6 +306,7 @@ class TrajectoryProcessor():
         plt.tight_layout()
         plt.xticks([])
         plt.yticks([])
+
         print('Saving...')
         suffix = '' if self.drop_interp else '_interp'
         plt.savefig(f'{self.out_dir}/{self.airport}{suffix}.png', dpi=self.dpi, bbox_inches='tight')
